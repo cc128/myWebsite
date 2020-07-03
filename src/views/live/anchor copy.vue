@@ -1,0 +1,245 @@
+<template>
+    <div class="anchor">
+        <div class="title-name">我的名字{{ mYname }}</div>
+        <div v-for="(item,i) in userData" :key="i" class="user-list" v-show="item.name !== mYname">
+            <div>{{ item.name }}</div>
+            <div style="flex: 1;"></div>
+            <div class="icon-btn" @click="callF(item)">
+                <svg t="1588602834610" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3774" width="25" height="25">
+                    <path d="M641.489535 506.850196H361.543284a35.169772 35.169772 0 1 1 0-70.339544h279.946251a35.169772 35.169772 0 0 1 0 70.339544zM641.489535 328.690913H361.543284a35.169772 35.169772 0 1 1 0-70.339544h279.946251a35.169772 35.169772 0 0 1 0 70.339544z" fill="#FF4B9D" p-id="3775"></path>
+                    <path d="M509.025284 720.692678a203.060508 203.060508 0 0 1-202.803794-202.932152V208.035491a202.932151 202.932151 0 1 1 405.735946 0v309.725035A203.060508 203.060508 0 0 1 509.025284 720.692678z m0-645.249795a132.592607 132.592607 0 0 0-132.46425 132.592608v309.725035a132.592607 132.592607 0 0 0 265.056858 0V208.035491A132.720964 132.720964 0 0 0 509.025284 75.442883zM688.724849 825.303496a35.298129 35.298129 0 0 1-18.483384-65.205271 303.820621 303.820621 0 0 0 145.428291-260.179298v-68.029121a35.169772 35.169772 0 0 1 70.339544 0v68.029121a373.903452 373.903452 0 0 1-178.801067 320.121939 34.913058 34.913058 0 0 1-18.483384 5.26263z" fill="#0060F7" p-id="3776"></path>
+                    <path d="M510.052139 875.747731A376.342231 376.342231 0 0 1 134.223335 499.918927v-68.029121a35.169772 35.169772 0 0 1 70.339544 0v68.029121a305.874331 305.874331 0 0 0 305.48926 305.48926 35.169772 35.169772 0 1 1 0 70.339544z" fill="#0060F7" p-id="3777"></path>
+                    <path d="M510.052139 1023.999872a35.169772 35.169772 0 0 1-35.169772-35.169772V840.577959a35.298129 35.298129 0 0 1 70.467901 0v148.252141a35.169772 35.169772 0 0 1-35.298129 35.169772z" fill="#0060F7" p-id="3778"></path>
+                </svg>
+                &nbsp;
+            </div>
+            <div class="icon-btn" @click="callF(item)">
+                <svg t="1588602941840" class="icon" viewBox="0 0 1521 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6769" width="30" height="30">
+                    <path d="M791.426681 1024H200.773245A201.149577 201.149577 0 0 1 0 823.226755V200.773245A201.149577 201.149577 0 0 1 200.773245 0h696.214627a201.149577 201.149577 0 0 1 200.961411 200.773245v768.470415a51.557516 51.557516 0 0 1-103.115031 0V200.773245a97.84638 97.84638 0 0 0-97.658214-97.658214h-696.214627a97.84638 97.84638 0 0 0-97.658214 97.658214v622.45351a97.84638 97.84638 0 0 0 97.658214 97.658214h590.46527a51.557516 51.557516 0 0 1 0 103.115031z" fill="#0060F7" p-id="6770"></path>
+                    <path d="M1425.922822 826.049247a96.341051 96.341051 0 0 1-56.449834-18.816612L1026.44616 553.396545a51.557516 51.557516 0 0 1 0-82.79309l342.46233-253.647924a95.776553 95.776553 0 0 1 152.790885 76.959941v436.357222a96.152885 96.152885 0 0 1-95.776553 95.776553z m-282.249173-314.049247L1418.584344 715.031239V308.404263z" fill="#0060F7" p-id="6771"></path>
+                    <path d="M793.308343 795.37817H282.249173a51.557516 51.557516 0 1 1 0-103.115031h511.05917a51.557516 51.557516 0 0 1 0 103.115031zM776.185226 355.257626H639.764792a51.745682 51.745682 0 0 1 0-103.303197h136.796766a51.745682 51.745682 0 0 1 0 103.303197z" fill="#FF4B9D" p-id="6772"></path>
+                </svg>
+            </div>
+        </div>
+        <div v-if="who === 2" class="call-box">
+            <div>{{ state }}</div>
+            <div class="btn-box">
+                <input v-if="isReception" class="btn" type="button" value="接听" @click="takeInF" />
+                <input class="btn" type="button" value="挂断" @click="overCallF(2)" />
+            </div>
+        </div>
+        <div v-if="who === 1" class="call-box">
+            <div>{{ state }}</div>
+            <div class="btn-box">
+                <svg t="1588603825413" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6968" width="50" height="50" @click="overCallF(1)">
+                    <path d="M841.216 856.064c185.856-185.856 185.856-487.424 0-673.792C655.36-3.584 353.792-3.584 167.424 182.272c-185.856 185.856-185.856 487.424 0 673.792 186.368 185.856 487.936 185.856 673.792 0zM218.624 495.104c0-47.616 111.104-113.664 285.696-113.664 175.104 0 285.696 66.048 285.696 113.664 0 40.96 10.752 102.4-73.728 93.184-84.48-9.216-78.848-40.96-78.848-83.456 0-29.696-68.608-36.352-133.12-36.352-65.024 0-133.12 6.656-133.12 36.352 0 42.496 5.632 74.24-78.848 83.456-84.992 9.216-73.728-51.712-73.728-93.184z" fill="red" p-id="6969"></path>
+                </svg>
+            </div>
+        </div>
+        <video v-if="who" id="video-box" autoplay></video>
+        <video v-if="who" id="video2" width="200" height="200" autoplay="autoplay" muted="muted"></video>
+    </div>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            mYname: sessionStorage.getItem("mYname") || "",
+            who: 0, //1为呼叫者，2为被呼叫者
+            isReception: false, //是否接受通讯链接
+            videoBox: null,
+            localStream: null,
+            video2: null,
+            state: "",
+            callId: "", //呼叫人id
+            called: "", //被呼叫人id
+            socketId: "", //自己得id
+            userData: [],
+
+            isVideo2: false,
+            mediaRecorder: null, //视频流对象
+            mediaSource: null, //推流对象
+            sourceBuffer: null
+        }
+    },
+    created() {
+        if (!this.mYname) {
+            this.setPrompt();
+        }
+        // 自己得id
+        this.$socket.on("socketId", socketId => {
+            this.socketId = socketId;
+            this.$socket.emit("userLink", {
+                name: this.mYname,
+                socketId: this.socketId,
+                isZB: false
+            }); //链接房间
+        });
+
+        // 获取链接房间得用户
+        this.$socket.on("userList", list => {
+            console.log(list);
+            this.userData = list;
+        });
+    },
+    mounted() {
+        window.addEventListener("unload", e => {
+            var _beforeUnload_time = 0;
+            var _gap_time = 0;
+            if (_gap_time <= 5) {
+                //刷新和关闭都会走
+                this.$socket.emit("aaaaa", "刷新");
+            }
+            // 关闭走这里-刷新不走
+            this.$socket.emit("aaaaa", "浏览器关闭");
+        });
+        this.$socket.on("showCall", res => {
+            this.isReception = true;
+            this.state = `呼叫人${res.name}`;
+            this.who = 2;
+            this.callId = res.callId; //呼叫人id
+            this.called = res.called; //被呼叫人id
+        });
+        //接收私密消息
+        this.$socket.on("secretMsg", res => {
+            if (res.isConsent === false) {
+                // 挂断操作
+                this.who = 0;
+                this.state = "";
+                if (this.mediaRecorder) {
+                    this.mediaRecorder.stop(); //停止获取视频流
+                }
+                if (this.sourceBuffer) {
+                    // this.sourceBuffer.abort(); //
+                }
+                if (this.mediaSource) {
+                    this.mediaSource.removeEventListener(
+                        "sourceopen",
+                        this.sourceOpen
+                    );
+                }
+            } else if (res.isConsent === true) {
+                // 接通操作
+                this.isReception = false;
+                this.state = "视频已链接";
+                this.isVideo2 = true;
+                this.$nextTick(() => {
+                    this.video2 = document.querySelector("#video2");
+                    // 创建可添加视频流的url
+                    this.mediaSource = new MediaSource();
+                    this.video2.src = window.URL.createObjectURL(
+                        this.mediaSource
+                    );
+                    // 创建可添加视频流的url
+                    this.mediaSource.addEventListener(
+                        "sourceopen",
+                        this.sourceOpen
+                    );
+                    this.videoStream("sendVideo", res.sendVideoId);
+                });
+            }
+        });
+        // 接收视频流
+        this.$socket.on("videoMsg", data => {
+            console.log("接收到视频流", data.video);
+            this.sourceBuffer.appendBuffer(new Uint8Array(data.video));
+        });
+        // this.videoStream();
+    },
+    methods: {
+        // 呼叫
+        callF(item) {
+            this.who = 1;
+            this.state = `呼叫${item.name}中...`;
+            this.called = item.id; //被呼叫人得id
+            this.$socket.emit("sendCall", {
+                callId: this.socketId,
+                called: this.called
+            });
+            this.$nextTick(() => {
+                this.videoStream();
+            });
+        },
+        // 挂断
+        overCallF(state) {
+            // state 1为呼叫方挂断-2为被呼叫方挂断
+            this.$socket.emit("overCall", {
+                callId: this.callId,
+                called: this.called,
+                state: state
+            });
+        },
+        // 接受
+        takeInF() {
+            this.$socket.emit("tokeCall", {
+                callId: this.callId,
+                called: this.called
+            });
+        },
+        // 调用摄像头
+        async videoStream(params, id) {
+            // 获取视频标签
+            this.videoBox = document.querySelector("#video-box");
+            // 调用摄像头
+            this.localStream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                // video: true
+                video: {
+                    // width: 640,
+                    // height: 360,
+                    facingMode: { exact: "environment" }
+                    // facingMode: { exact: "user" }
+                }
+            });
+            // 获取摄像头画面，赋值给video标签
+            this.videoBox.srcObject = this.localStream;
+            // 播放
+            this.videoBox.onloadedmetadata = e => {
+                this.videoBox.play();
+            };
+            if (params === "sendVideo") {
+                this.sendVideo(id);
+            }
+        },
+        // 创建视频流
+        sendVideo(userId) {
+            // this.mediaRecorder.stop();
+            this.mediaRecorder = new MediaRecorder(this.localStream, {
+                mimeType: "video/webm;codecs=vp9"
+            });
+            // 500毫秒发送一次，视频流到后端
+            this.mediaRecorder.ondataavailable = blob => {
+                if (this.who) {
+                    this.$socket.emit("videoStreaming", {
+                        video: blob.data,
+                        receiveUserId: userId
+                    });
+                    console.log("发送视频流", 1111);
+                }
+            };
+            this.mediaRecorder.start(500);
+        },
+        // 接收视频流
+        sourceOpen(e) {
+            this.sourceBuffer = this.mediaSource.addSourceBuffer(
+                "video/webm;codecs=vp9"
+            );
+            URL.revokeObjectURL(this.video2.src);
+        },
+        setPrompt() {
+            this.mYname = prompt("请输入昵称");
+            if (this.mYname) {
+                sessionStorage.setItem("mYname", this.mYname);
+                return;
+            } else {
+                this.setPrompt();
+            }
+        }
+    },
+
+}
+</script>
+
+<style>
+</style>

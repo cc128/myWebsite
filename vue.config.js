@@ -23,7 +23,7 @@ module.exports = {
             }
         }
     },
-    publicPath: "/",
+    publicPath: "/video2",
     // publicPath: "./",
     outputDir: "dist",
     productionSourceMap: false //打包时候js是否添加sourceMap
