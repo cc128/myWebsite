@@ -11,9 +11,23 @@ const routes = [
         component: Home,
         children: [
             {
+                path: "/",
+                redirect: "/video-call"
+            },
+            {
                 path: "/video-call",
-                name: "视频通话",
+                name: "视频语音",
                 component: () => import("../views/video-call/video-call.vue")
+            },
+            {
+                path: "/chatroom",
+                name: "聊天室",
+                component: () => import("../views/chatroom/chatroom.vue")
+            },
+            {
+                path: "/game",
+                name: "小游戏",
+                component: () => import("../views/game/game.vue")
             },
             {
                 path: "/open-live",
@@ -26,8 +40,7 @@ const routes = [
                 component: () => import("../views/live/look-live.vue")
             }
         ]
-    },
-
+    }
 ];
 
 const router = new VueRouter({

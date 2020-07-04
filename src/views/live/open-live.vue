@@ -24,25 +24,25 @@ export default {
         };
     },
     created() {
-        if (!this.mYname) {
-            this.setPrompt();
-        }
+        // if (!this.mYname) {
+        //     this.setPrompt();
+        // }
     },
     mounted() {
-        // 自己得id
-        this.$socket.on("socketId", socketId => {
-            this.socketId = socketId;
-            this.$socket.emit("userLink", {
-                name: this.mYname,
-                socketId: this.socketId,
-                isZB: true
-            }); //链接房间
-        });
-        // 获取链接房间得用户
-        this.$socket.on("userList", list => {
-            console.log(list);
-            this.userData = Object.values(list);
-        });
+        // // 自己得id
+        // this.$socket.on("socketId", socketId => {
+        //     this.socketId = socketId;
+        //     this.$socket.emit("userLink", {
+        //         name: this.mYname,
+        //         socketId: this.socketId,
+        //         isZB: true
+        //     }); //链接房间
+        // });
+        // // 获取链接房间得用户
+        // this.$socket.on("userList", list => {
+        //     console.log(list);
+        //     this.userData = Object.values(list);
+        // });
     },
     methods: {
         // 开始直播
@@ -69,15 +69,17 @@ export default {
         },
         // 结束直播
         overLive() {
-            let tracks = this.videoBox.srcObject.getTracks();
-            tracks[0].stop();
-            window.URL.revokeObjectURL(this.videoBox.src);
-            this.webRTC.overVideo()
-            this.isLive = false;
-            //通知服务器结束直播
-            this.$socket.emit("overLive", {
-                socketId: this.socketId
-            });
+            if (this.videoBox) {
+                let tracks = this.videoBox.srcObject.getTracks();
+                tracks[0].stop();
+                window.URL.revokeObjectURL(this.videoBox.src);
+                this.webRTC.overVideo();
+                this.isLive = false;
+                //通知服务器结束直播
+                this.$socket.emit("overLive", {
+                    socketId: this.socketId
+                });
+            }
         },
         // 昵称
         setPrompt() {
@@ -93,7 +95,7 @@ export default {
         // window.onbeforeunload = function () {
         //     return '1111111';
         // }
-        this.overLive()
+        this.overLive();
     }
 };
 </script>
@@ -102,7 +104,6 @@ export default {
 .open-live {
     width: 100%;
     height: 100%;
-    background: red;
     .btn {
         position: absolute;
         left: 50%;

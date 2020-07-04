@@ -6,8 +6,8 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 Vue.use(ElementUI);
 import io from "socket.io-client";
-// Vue.prototype.$socket = io.connect("http://60.205.200.110:7005");
-Vue.prototype.$socket = io.connect("http://192.168.1.7:7005");
+Vue.prototype.$socket = io.connect("http://60.205.200.110:7005");
+// Vue.prototype.$socket = io.connect("http://192.168.0.187:7005");
 
 Vue.config.productionTip = false;
 
