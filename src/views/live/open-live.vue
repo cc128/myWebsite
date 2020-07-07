@@ -3,7 +3,7 @@
         <el-button v-if="isLive === false" class="btn" type="success" @click="startVideo">开始直播</el-button>
         <el-button v-else class="btn" type="danger" @click="overLive">结束直播</el-button>
 
-        <video id="video"></video>
+        <video v-show="isLive" id="video"></video>
         <div class="user-list">
             <div v-for="(item,i) in userData" :key="i">{{ item.name }}</div>
         </div>
@@ -24,26 +24,8 @@ export default {
         };
     },
     created() {
-        // if (!this.mYname) {
-        //     this.setPrompt();
-        // }
     },
-    mounted() {
-        // // 自己得id
-        // this.$socket.on("socketId", socketId => {
-        //     this.socketId = socketId;
-        //     this.$socket.emit("userLink", {
-        //         name: this.mYname,
-        //         socketId: this.socketId,
-        //         isZB: true
-        //     }); //链接房间
-        // });
-        // // 获取链接房间得用户
-        // this.$socket.on("userList", list => {
-        //     console.log(list);
-        //     this.userData = Object.values(list);
-        // });
-    },
+    mounted() {},
     methods: {
         // 开始直播
         async startVideo() {
@@ -81,15 +63,6 @@ export default {
                 });
             }
         },
-        // 昵称
-        setPrompt() {
-            this.mYname = prompt("请输入昵称");
-            if (this.mYname) {
-                sessionStorage.setItem("mYname", this.mYname);
-            } else {
-                this.setPrompt();
-            }
-        }
     },
     beforeDestroy() {
         // window.onbeforeunload = function () {

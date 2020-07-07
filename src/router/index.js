@@ -38,6 +38,11 @@ const routes = [
                 path: "/look-live",
                 name: "看直播",
                 component: () => import("../views/live/look-live.vue")
+            },
+            {
+                path: "/screenCAP",
+                name: "录屏",
+                component: () => import("../views/screenCAP")
             }
         ]
     }
