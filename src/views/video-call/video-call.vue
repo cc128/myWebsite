@@ -19,46 +19,50 @@
                 </svg>
             </div>
         </div>
-        <div v-if="userData.length <= 1" style="text-align: center;">
+        <div v-show="userData.length <= 1" style="text-align: center;">
             <br />
             <br />
             <span>暂无连接用户</span>
         </div>
-        <div v-if="who === 2" class="call-box">
-            <div>{{ state }}</div>
+        <div v-show="who === 2" class="call-box">
+            <div>{{ stateText }}</div>
             <div class="btn-box">
-                <el-button type="danger" @click="overCallF(2)">挂断</el-button>
-                <el-button v-if="isReception" type="success" @click="takeInF">接听</el-button>
+                <el-button type="danger" @click="overCallF">挂断</el-button>
+                <el-button v-show="isReception" type="success" @click="takeInF">接听</el-button>
             </div>
         </div>
-        <div v-if="who === 1" class="call-box">
-            <div>{{ state }}</div>
+        <div v-show="who === 1" class="call-box">
+            <div>{{ stateText }}</div>
             <div class="btn-box">
-                <el-button type="danger" @click="overCallF(1)">挂断</el-button>
+                <el-button type="danger" @click="overCallF">挂断</el-button>
                 <!-- <svg t="1588603825413" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6968" width="50" height="50" @click="overCallF(1)">
                     <path d="M841.216 856.064c185.856-185.856 185.856-487.424 0-673.792C655.36-3.584 353.792-3.584 167.424 182.272c-185.856 185.856-185.856 487.424 0 673.792 186.368 185.856 487.936 185.856 673.792 0zM218.624 495.104c0-47.616 111.104-113.664 285.696-113.664 175.104 0 285.696 66.048 285.696 113.664 0 40.96 10.752 102.4-73.728 93.184-84.48-9.216-78.848-40.96-78.848-83.456 0-29.696-68.608-36.352-133.12-36.352-65.024 0-133.12 6.656-133.12 36.352 0 42.496 5.632 74.24-78.848 83.456-84.992 9.216-73.728-51.712-73.728-93.184z" fill="red" p-id="6969"></path>
                 </svg>-->
             </div>
         </div>
-        <video v-if="who" id="video-box" autoplay></video>
+        <video v-show="who" id="callVideo" autoplay></video>
         <!-- controls="controls" -->
-        <video v-if="who" id="video2" width="200" height="200" autoplay="autoplay" muted="muted"></video>
+        <video v-show="true" id="calledVideo" width="200" height="200" autoplay="autoplay" muted="muted"></video>
     </div>
 </template>
 
 <script>
+import webrtc from "@/assets/js/webrtc";
 export default {
     data() {
         return {
             mYname: sessionStorage.getItem("mYname") || "用户",
+            webRTC: new webrtc(),
+            localStream: null, //呼叫人的视频流
+            callVideo: null, //呼叫人的视频播放元素
+            calledVideo: null,  //被呼叫人的视频播放元素
+
+
+            isReception: false, //是否接受通讯连接
             who: 0, //1为呼叫者，2为被呼叫者
-            isReception: false, //是否接受通讯链接
-            videoBox: null,
-            localStream: null,
-            video2: null,
-            state: "",
+            stateText: "", //连接状态文字
             callId: "", //呼叫人id
-            called: "", //被呼叫人id
+            calledId: "", //被呼叫人id
             socketId: this.$store.state.socketId, //自己得id
             userData: this.$store.state.videoLinkUserList, // 视频语音用户列表
 
@@ -86,25 +90,25 @@ export default {
     },
     created() { },
     mounted() {
+        // 被呼叫方-显示呼叫页面
         this.$socket.on("showCall", data => {
-            // console.log(data, "呼叫信息");
             this.isReception = true; //显示接听按钮
-            this.state = `呼叫人：${data.name}`;
-            this.who = 2;
+            this.stateText = `呼叫人：${data.name}`;
+            this.who = 2; // 被呼叫方-显示接听和挂断按钮
             this.callId = data.callId; //呼叫人id
-            this.called = data.called; //被呼叫人id
+            this.calledId = data.calledId; //被呼叫人id
         });
         //接收私密消息
         this.$socket.on("secretMsg", res => {
             if (res.isConsent === true) {
-                // 接通操作
+                // 接通操作-并调用摄像头
                 this.isReception = false; //接通后，隐藏接听按钮
-                this.state = "视频已链接";
+                this.stateText = "视频已链接";
                 this.$nextTick(() => {
-                    this.video2 = document.querySelector("#video2");
+                    this.calledVideo = document.querySelector("#calledVideo");
                     // 创建可添加视频流的url
                     this.mediaSource = new MediaSource();
-                    this.video2.src = window.URL.createObjectURL(
+                    this.calledVideo.src = window.URL.createObjectURL(
                         this.mediaSource
                     );
                     // 创建可添加视频流的url
@@ -112,12 +116,26 @@ export default {
                         "sourceopen",
                         this.sourceOpen
                     );
-                    this.videoStream("sendVideo", res.sendVideoId);
-                });
+                    this.webRTC.getCamera("#callVideo").then(data => {
+                        this.localStream = data.localStream; //自己的视频流
+                        this.callVideo = data.videoBox // 自己的视频播放元素
+                        this.sendVideo(res.sendVideoId)
+                    }).catch(err => {
+                        console.log("无可调用设备", err)
+                    });
+                })
+
             } else if (res.isConsent === false) {
                 // 挂断操作
                 this.who = 0;
-                this.state = "";
+                this.stateText = "";
+                if (this.calledVideo) {
+                    window.URL.revokeObjectURL(this.calledVideo.src);
+                    this.calledVideo.src = "";
+                    // this.calledVideo.removeAttribute("src")
+                    // this.calledVideo.load()
+                }
+                console.log(this.calledVideo, 1111)
                 if (this.mediaRecorder) {
                     this.mediaRecorder.stop(); //停止获取视频流
                 }
@@ -134,74 +152,50 @@ export default {
         });
         // 接收视频流
         this.$socket.on("videoMsg", data => {
-            // console.log("接收到视频流", data.video);
             this.sourceBuffer.appendBuffer(new Uint8Array(data.video));
         });
-        // this.videoStream();
     },
     methods: {
         // 呼叫
         callF(item) {
-            this.who = 1;
-            this.state = `呼叫：${item.name}中...`;
-            this.called = item.socketId; //被呼叫人得id
+            this.webRTC.getCamera("#callVideo").then(data => {
+                this.localStream = data.localStream; //自己的视频流
+                this.callVideo = data.videoBox // 自己的视频播放元素
+            }).catch(err => {
+                console.log("无可调用设备", err)
+            });
+            this.who = 1; // 自己的页面显示挂断按钮
+            this.stateText = `呼叫：${item.name}中...`;
+            this.calledId = item.socketId; //被呼叫人得id
+            // 发送呼叫信息给服务器
             this.$socket.emit("sendCall", {
                 callId: this.socketId, //呼叫人id
-                called: this.called, //被呼叫人id
-                name: this.$store.state.mYname
-            });
-            this.$nextTick(() => {
-                this.videoStream();
+                calledId: this.calledId, //被呼叫人id
+                name: this.$store.state.mYname, //呼叫人名称
             });
         },
         // 挂断
-        overCallF(state) {
-            // state 1为呼叫方挂断-2为被呼叫方挂断
+        overCallF() {
+            // who传 1为呼叫方挂断-2为被呼叫方挂断
             this.$socket.emit("overCall", {
                 callId: this.callId,
-                called: this.called,
-                state: state
+                calledId: this.calledId,
+                who: this.who
             });
         },
         // 接受
         takeInF() {
             this.$socket.emit("tokeCall", {
                 callId: this.callId,
-                called: this.called
+                calledId: this.calledId
             });
         },
-        // 调用摄像头
-        async videoStream(params, id) {
-            // 获取视频标签
-            this.videoBox = document.querySelector("#video-box");
-            // 调用摄像头
-            this.localStream = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                // video: true
-                video: {
-                    // width: 640,
-                    // height: 360,
-                    facingMode: { exact: "environment" }
-                    // facingMode: { exact: "user" }
-                }
-            });
-            // 获取摄像头画面，赋值给video标签
-            this.videoBox.srcObject = this.localStream;
-            // 播放
-            this.videoBox.onloadedmetadata = e => {
-                this.videoBox.play();
-            };
-            if (params === "sendVideo") {
-                this.sendVideo(id);
-            }
-        },
-        // 创建视频流
+        // 创建视频流-发送给服务器
         sendVideo(userId) {
-            // this.mediaRecorder.stop();
             this.mediaRecorder = new MediaRecorder(this.localStream, {
                 mimeType: "video/webm;codecs=vp9"
             });
-            // 500毫秒发送一次，视频流到后端
+            // 200毫秒发送一次，视频流到后端
             this.mediaRecorder.ondataavailable = blob => {
                 if (this.who) {
                     this.$socket.emit("videoStreaming", {
@@ -217,7 +211,7 @@ export default {
             this.sourceBuffer = this.mediaSource.addSourceBuffer(
                 "video/webm;codecs=vp9"
             );
-            URL.revokeObjectURL(this.video2.src);
+            // window.URL.revokeObjectURL(this.calledVideo.src);
         },
         setPrompt() {
             this.mYname = prompt("请输入昵称");
@@ -276,15 +270,16 @@ export default {
             justify-content: center;
         }
     }
-    #video-box {
+    #callVideo {
         width: 100%;
         height: 100%;
         position: absolute;
         top: 0;
         left: 0;
         z-index: 1;
+        border: 1px solid;
     }
-    #video2 {
+    #calledVideo {
         position: absolute;
         left: 0;
         bottom: 50px;
@@ -294,7 +289,7 @@ export default {
 // const link = document.createElement("a");
 // link.style.display = "none";
 // const downloadUrl = window.URL.createObjectURL(new Blob(this.videoData));
-// this.video2.src = downloadUrl;
+// this.calledVideo.src = downloadUrl;
 // link.href = downloadUrl;
 // link.download = "mediafegaegag.mp4";
 // document.body.appendChild(link);

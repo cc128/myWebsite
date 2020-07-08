@@ -2,30 +2,37 @@ class webrtc {
     constructor(x, y) {
         this.mediaRecorder = null;
     }
-    async getCamera(tag) {
+    getCamera(tag) {
         let videoBox = document.querySelector(tag);
-        let localStream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-                width: { min: 1024, ideal: 1280, max: 1920 },
-                height: { min: 576, ideal: 720, max: 1080 },
-                width: videoBox.clientHeight,
-                height: videoBox.clientWidth,
-                facingMode: {
-                    exact: "environment"
+        return navigator.mediaDevices
+            .getUserMedia({
+                audio: false,
+                video: {
+                    width: { min: 1024, ideal: 1280, max: 1920 },
+                    height: { min: 576, ideal: 720, max: 1080 },
+                    width: videoBox.offsetWidth,
+                    height: videoBox.offsetHeight,
+                    facingMode: {
+                        exact: "environment"
+                    }
                 }
-            }
-        });
-        // 获取摄像头画面，赋值给video标签
-        videoBox.srcObject = localStream;
-        // 播放
-        videoBox.onloadedmetadata = e => {
-            videoBox.play();
-        };
-        return {
-            videoBox: videoBox,
-            localStream: localStream
-        };
+            })
+            .then(localStream => {
+                // 获取摄像头画面，赋值给video标签
+                videoBox.srcObject = localStream;
+                // 播放
+                videoBox.onloadedmetadata = e => {
+                    videoBox.play();
+                };
+                return {
+                    videoBox: videoBox,
+                    localStream: localStream
+                };
+            })
+            // .catch(err => {
+            //     alert(1);
+            //     // return err
+            // });
     }
     // 创建视频流
     getStream(localStream, callBack, time = 500) {
