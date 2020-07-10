@@ -42,7 +42,7 @@
         </div>
         <video v-show="who" id="callVideo" autoplay></video>
         <!-- controls="controls" -->
-        <video v-show="true" id="calledVideo" width="200" height="200" autoplay="autoplay" muted="muted"></video>
+        <video v-show="who" id="calledVideo" width="200" height="200" autoplay="autoplay" muted="muted"></video>
     </div>
 </template>
 
@@ -51,6 +51,7 @@ import webrtc from "@/assets/js/webrtc";
 export default {
     data() {
         return {
+            track: null, //
             mYname: sessionStorage.getItem("mYname") || "用户",
             webRTC: new webrtc(),
             localStream: null, //呼叫人的视频流
@@ -133,9 +134,8 @@ export default {
                     window.URL.revokeObjectURL(this.calledVideo.src);
                     this.calledVideo.src = "";
                     // this.calledVideo.removeAttribute("src")
-                    // this.calledVideo.load()
+                    this.calledVideo.load()
                 }
-                console.log(this.calledVideo, 1111)
                 if (this.mediaRecorder) {
                     this.mediaRecorder.stop(); //停止获取视频流
                 }
@@ -148,6 +148,7 @@ export default {
                         this.sourceOpen
                     );
                 }
+                this.webRTC.closeCamera();
             }
         });
         // 接收视频流
@@ -158,12 +159,6 @@ export default {
     methods: {
         // 呼叫
         callF(item) {
-            this.webRTC.getCamera("#callVideo").then(data => {
-                this.localStream = data.localStream; //自己的视频流
-                this.callVideo = data.videoBox // 自己的视频播放元素
-            }).catch(err => {
-                console.log("无可调用设备", err)
-            });
             this.who = 1; // 自己的页面显示挂断按钮
             this.stateText = `呼叫：${item.name}中...`;
             this.calledId = item.socketId; //被呼叫人得id
@@ -172,6 +167,12 @@ export default {
                 callId: this.socketId, //呼叫人id
                 calledId: this.calledId, //被呼叫人id
                 name: this.$store.state.mYname, //呼叫人名称
+            });
+            this.webRTC.getCamera("#callVideo").then(data => {
+                this.localStream = data.localStream; //自己的视频流
+                this.callVideo = data.videoBox // 自己的视频播放元素
+            }).catch(err => {
+                console.log("无可调用设备", err)
             });
         },
         // 挂断
