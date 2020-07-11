@@ -40,9 +40,9 @@
                 </svg>-->
             </div>
         </div>
-        <video v-show="who" id="callVideo" autoplay></video>
+        <video v-show="true" id="callVideo" autoplay></video>
         <!-- controls="controls" -->
-        <video v-show="who" id="calledVideo" width="200" height="200" autoplay="autoplay" muted="muted"></video>
+        <video v-show="true" id="calledVideo" autoplay="autoplay" muted="muted"></video>
     </div>
 </template>
 
@@ -109,14 +109,9 @@ export default {
                     this.calledVideo = document.querySelector("#calledVideo");
                     // 创建可添加视频流的url
                     this.mediaSource = new MediaSource();
-                    this.calledVideo.src = window.URL.createObjectURL(
-                        this.mediaSource
-                    );
+                    this.calledVideo.src = window.URL.createObjectURL(this.mediaSource);
                     // 创建可添加视频流的url
-                    this.mediaSource.addEventListener(
-                        "sourceopen",
-                        this.sourceOpen
-                    );
+                    this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
                     this.webRTC.getCamera("#callVideo").then(data => {
                         this.localStream = data.localStream; //自己的视频流
                         this.callVideo = data.videoBox // 自己的视频播放元素
@@ -127,38 +122,50 @@ export default {
                 })
 
             } else if (res.isConsent === false) {
+                this.webRTC.closeCamera(); // 关闭摄像头
                 // 挂断操作
                 this.who = 0;
                 this.stateText = "";
                 if (this.calledVideo) {
                     window.URL.revokeObjectURL(this.calledVideo.src);
                     this.calledVideo.src = "";
-                    // this.calledVideo.removeAttribute("src")
+                    this.calledVideo.removeAttribute("src")
                     this.calledVideo.load()
+                    console.log("挂断")
                 }
                 if (this.mediaRecorder) {
                     this.mediaRecorder.stop(); //停止获取视频流
                 }
-                if (this.sourceBuffer) {
-                    // this.sourceBuffer.abort(); //
-                }
+                // if (this.sourceBuffer) {
+                //     this.sourceBuffer.abort(); //
+                // }
                 if (this.mediaSource) {
-                    this.mediaSource.removeEventListener(
-                        "sourceopen",
-                        this.sourceOpen
-                    );
+                    this.mediaSource.removeEventListener("sourceopen", this.sourceOpen);
                 }
-                this.webRTC.closeCamera();
+                this.callVideo = null; //呼叫人的视频播放元素
+                this.calledVideo = null;  //被呼叫人的视频播放元素
+                this.mediaRecorder = null; //视频流对象
+                this.mediaSource = null; //推流对象
+                this.sourceBuffer = null;
             }
         });
         // 接收视频流
         this.$socket.on("videoMsg", data => {
-            this.sourceBuffer.appendBuffer(new Uint8Array(data.video));
+            console.log("接收视频流")
+            if (this.who) {
+                this.sourceBuffer.appendBuffer(new Uint8Array(data.video));
+            }
         });
     },
     methods: {
         // 呼叫
         callF(item) {
+            // this.webRTC.getCamera("#callVideo").then(data => {
+            //     this.localStream = data.localStream; //自己的视频流
+            //     this.callVideo = data.videoBox // 自己的视频播放元素
+            // }).catch(err => {
+            //     console.log("无可调用设备", err)
+            // });
             this.who = 1; // 自己的页面显示挂断按钮
             this.stateText = `呼叫：${item.name}中...`;
             this.calledId = item.socketId; //被呼叫人得id
@@ -167,12 +174,6 @@ export default {
                 callId: this.socketId, //呼叫人id
                 calledId: this.calledId, //被呼叫人id
                 name: this.$store.state.mYname, //呼叫人名称
-            });
-            this.webRTC.getCamera("#callVideo").then(data => {
-                this.localStream = data.localStream; //自己的视频流
-                this.callVideo = data.videoBox // 自己的视频播放元素
-            }).catch(err => {
-                console.log("无可调用设备", err)
             });
         },
         // 挂断
@@ -207,21 +208,11 @@ export default {
             };
             this.mediaRecorder.start(200);
         },
-        // 接收视频流
+        // 设置视频流格式
         sourceOpen(e) {
-            this.sourceBuffer = this.mediaSource.addSourceBuffer(
-                "video/webm;codecs=vp9"
-            );
+            console.log("111111111111")
+            this.sourceBuffer = this.mediaSource.addSourceBuffer("video/webm;codecs=vp9");
             // window.URL.revokeObjectURL(this.calledVideo.src);
-        },
-        setPrompt() {
-            this.mYname = prompt("请输入昵称");
-            if (this.mYname) {
-                sessionStorage.setItem("mYname", this.mYname);
-                return;
-            } else {
-                this.setPrompt();
-            }
         }
     }
 };
@@ -257,11 +248,11 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        // background: radial-gradient(
-        //     rgba(0, 0, 0, 0.1),
-        //     rgba(0, 0, 0, 0) 0.5%,
-        //     rgba(0, 0, 0, 1)
-        // );
+        background: radial-gradient(
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0) 0.5%,
+            rgba(0, 0, 0, 1)
+        );
         .btn-box {
             width: 100%;
             position: absolute;
@@ -272,19 +263,24 @@ export default {
         }
     }
     #callVideo {
-        width: 100%;
-        height: 100%;
+        width: 50vw;
+        // height: 100vh;
         position: absolute;
-        top: 0;
+        bottom: 0;
         left: 0;
         z-index: 1;
-        border: 1px solid;
+        // border: 1px solid #000;
+        background: rgba(225, 225, 255, 0.5);
+        border-top: 1px solid red;
     }
     #calledVideo {
+        border-top: 1px solid #000;
+        width: 50vw;
         position: absolute;
-        left: 0;
-        bottom: 50px;
+        bottom: 0;
+        right: 0;
         z-index: 2;
+        background: rgba(0, 0, 0, 0.5);
     }
 }
 // const link = document.createElement("a");

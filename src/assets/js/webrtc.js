@@ -3,6 +3,7 @@ class webrtc {
         this.mediaRecorder = null;
         this.videoBox = null; //视频元素
         this.tracks = null;
+        this.front = true;
     }
     getCamera(tag) {
         this.videoBox = document.querySelector(tag);
@@ -10,13 +11,12 @@ class webrtc {
             .getUserMedia({
                 audio: false,
                 video: {
-                    width: { min: 1024, ideal: 1280, max: 1920 },
-                    height: { min: 576, ideal: 720, max: 1080 },
-                    width: this.videoBox.offsetWidth,
-                    height: this.videoBox.offsetHeight,
-                    facingMode: {
-                        exact: "environment"
-                    }
+                    // width: { min: 1024, ideal: 1280, max: 1920 },
+                    // height: { min: 576, ideal: 720, max: 1080 },
+                    width: this.videoBox.offsetHeight,
+                    height: this.videoBox.offsetWidth,
+
+                    facingMode: this.front ? "environment" : "user"
                 }
             })
             .then(localStream => {
@@ -31,10 +31,6 @@ class webrtc {
                     videoBox: this.videoBox,
                     localStream: localStream
                 };
-            })
-            .catch(err => {
-                alert(1);
-                // return err
             });
     }
     // 创建视频流
@@ -62,6 +58,9 @@ class webrtc {
         if (this.mediaRecorder) {
             this.mediaRecorder.stop();
         }
+    }
+    reversal() {
+        this.front = !this.front;
     }
 }
 export default webrtc;
