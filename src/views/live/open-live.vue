@@ -35,7 +35,15 @@ export default {
             }
         },
     },
-    created() { },
+    created() {
+        if (this.socketId) {
+            this.$socket.emit("userLink", {
+                name: this.mYname,
+                socketId: this.socketId,
+                type: this.$route.name
+            }); //链接房间
+        }
+    },
     mounted() { },
     methods: {
         // 开始直播

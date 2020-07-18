@@ -1,8 +1,6 @@
 <template>
     <div class="look-live">
-        <div v-for="(item, i) in ">
-            <video autoplay="autoplay" muted="muted"></video>
-        </div>
+        <video v-for="(item, i) in liveList" :key="i" autoplay="autoplay" muted="muted" @click="getVideo($event, item)"></video>
     </div>
 </template>
 
@@ -11,7 +9,7 @@ export default {
     data() {
         return {
             socketId: this.$store.state.socketId, //自己得id
-            liveList: [], //直播列表
+            liveList: this.$store.state.openLiveUserList, //直播列表
             one: true,
             socketId: null,
             mYname: sessionStorage.getItem("mYname") || null,
@@ -33,13 +31,13 @@ export default {
         },
         "$store.state.openLiveUserList": function (v1, v2) {
             if (v1) {
+                console.log("直播列表")
                 this.liveList = this.$store.state.openLiveUserList;
             }
         }
     },
     created() {
         if (this.socketId) {
-            this.socketId = this.$store.state.socketId;
             this.$socket.emit("userLink", {
                 name: this.mYname,
                 socketId: this.socketId,
@@ -48,14 +46,7 @@ export default {
         }
     },
     mounted() {
-        this.video = document.querySelector("video");
-        // 创建可添加视频流的url
-        this.mediaSource = new MediaSource();
-        this.video.src = window.URL.createObjectURL(this.mediaSource);
-        // 创建可添加视频流的url
-        this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
-
-        // 获取视频
+        // // 获取视频
         this.$socket.on("videoData", data => {
             console.log(data);
             this.sourceBuffer.appendBuffer(new Uint8Array(data.video));
@@ -66,6 +57,15 @@ export default {
         });
     },
     methods: {
+        getVideo(el, e) {
+            console.log(e.target, e, 1111111)
+            // this.video = e.target;
+            // // // 创建可添加视频流的url
+            // this.mediaSource = new MediaSource();
+            // this.video.src = window.URL.createObjectURL(this.mediaSource);
+            // // // 创建可添加视频流的url
+            // this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
+        },
         // 接收视频流
         sourceOpen(e) {
             this.sourceBuffer = this.mediaSource.addSourceBuffer(

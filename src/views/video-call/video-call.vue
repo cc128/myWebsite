@@ -91,7 +91,6 @@ export default {
     },
     created() {
         if (this.socketId) {
-            this.socketId = this.$store.state.socketId;
             this.$socket.emit("userLink", {
                 name: this.mYname,
                 socketId: this.socketId,
@@ -223,7 +222,15 @@ export default {
             this.sourceBuffer = this.mediaSource.addSourceBuffer("video/webm;codecs=vp9");
             // window.URL.revokeObjectURL(this.calledVideo.src);
         }
-    }
+    },
+    // beforeRouteLeave(to, from, next) {
+    //     this.$socket.emit("setType", {
+    //         socketId: this.socketId,
+    //         newType: to.name,
+    //         formerType: from.name
+    //     })
+    //     next()
+    // }
 };
 </script>
 
