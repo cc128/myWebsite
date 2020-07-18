@@ -65,7 +65,7 @@ export default {
             callId: "", //呼叫人id
             calledId: "", //被呼叫人id
             socketId: this.$store.state.socketId, //自己得id
-            userData: this.$store.state.videoLinkUserList, // 视频语音用户列表
+            userData: this.$store.state.videoCallUserList, // 视频语音用户列表
 
             mediaRecorder: null, //视频流对象
             mediaSource: null, //推流对象
@@ -83,13 +83,22 @@ export default {
                 }); //链接房间
             }
         },
-        "$store.state.videoLinkUserList": function (v1, v2) {
+        "$store.state.videoCallUserList": function (v1, v2) {
             if (v1) {
-                this.userData = this.$store.state.videoLinkUserList;
+                this.userData = this.$store.state.videoCallUserList;
             }
         }
     },
-    created() { },
+    created() {
+        if (this.socketId) {
+            this.socketId = this.$store.state.socketId;
+            this.$socket.emit("userLink", {
+                name: this.mYname,
+                socketId: this.socketId,
+                type: this.$route.name
+            }); //链接房间
+        }
+    },
     mounted() {
         // 被呼叫方-显示呼叫页面
         this.$socket.on("showCall", data => {

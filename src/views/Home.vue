@@ -85,15 +85,12 @@
 export default {
     data() {
         return {
-            mYname:
-                sessionStorage.getItem("mYname") ||
-                "用户" + ("" + Math.random()).substr(0, 6).replace(".", ""),
+            mYname: sessionStorage.getItem("mYname") || "用户" + ("" + Math.random()).substr(0, 6).replace(".", ""),
             activeIndex2: this.$route.fullPath
         };
     },
     created() {
-        this.$store.state.mYname =
-            sessionStorage.getItem("mYname") || this.mYname;
+        this.$store.state.mYname = sessionStorage.getItem("mYname") || this.mYname;
         sessionStorage.setItem("mYname", this.mYname);
 
         //获取自己的id
@@ -101,10 +98,15 @@ export default {
             console.log("自己的id", socketId);
             this.$store.state.socketId = socketId;
         });
-        // 获取链接房间得用户
-        this.$socket.on("videoLinkUserList", list => {
-            console.log(list, "可连接用户");
-            this.$store.state.videoLinkUserList = list;
+        // 获取链接房间得视频用户
+        this.$socket.on("videoCallUserList", list => {
+            console.log(list, "视频用户");
+            this.$store.state.videoCallUserList = list;
+        });
+        // 获取链接房间得直播用户
+        this.$socket.on("openLiveUserList", list => {
+            console.log(list, "直播用户");
+            this.$store.state.openLiveUserList = list;
         });
     },
     methods: {

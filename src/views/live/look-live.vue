@@ -1,6 +1,8 @@
 <template>
     <div class="look-live">
-        <video autoplay="autoplay" muted="muted"></video>
+        <div v-for="(item, i) in ">
+            <video autoplay="autoplay" muted="muted"></video>
+        </div>
     </div>
 </template>
 
@@ -8,6 +10,8 @@
 export default {
     data() {
         return {
+            socketId: this.$store.state.socketId, //自己得id
+            liveList: [], //直播列表
             one: true,
             socketId: null,
             mYname: sessionStorage.getItem("mYname") || null,
@@ -16,23 +20,32 @@ export default {
             sourceBuffer: null
         };
     },
-    created() {
-        if (!this.mYname) {
-            this.setPrompt();
+    watch: {
+        "$store.state.socketId": function (v1, v2) {
+            if (v1) {
+                this.socketId = this.$store.state.socketId;
+                this.$socket.emit("userLink", {
+                    name: this.mYname,
+                    socketId: this.socketId,
+                    type: this.$route.name
+                }); //链接房间
+            }
+        },
+        "$store.state.openLiveUserList": function (v1, v2) {
+            if (v1) {
+                this.liveList = this.$store.state.openLiveUserList;
+            }
         }
-        // 自己得id
-        this.$socket.on("socketId", socketId => {
-            this.socketId = socketId;
+    },
+    created() {
+        if (this.socketId) {
+            this.socketId = this.$store.state.socketId;
             this.$socket.emit("userLink", {
                 name: this.mYname,
                 socketId: this.socketId,
-                isZB: false
+                type: this.$route.name
             }); //链接房间
-        });
-        // 获取链接房间得用户
-        this.$socket.on("userList", list => {
-            console.log(list);
-        });
+        }
     },
     mounted() {
         this.video = document.querySelector("video");

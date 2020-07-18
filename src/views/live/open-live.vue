@@ -35,28 +35,37 @@ export default {
             }
         },
     },
-    created() {
-    },
+    created() { },
     mounted() { },
     methods: {
         // 开始直播
         startVideo() {
             // 获取摄像头权限
             this.webRTC.getCamera("#anchor-video").then(data => {
+                this.socketId = this.$store.state.socketId;
+                this.$socket.emit("userLink", {
+                    name: this.mYname,
+                    socketId: this.socketId,
+                    type: this.$route.name
+                }); //链接房间
+
                 this.localStream = data.localStream; //自己的视频流
                 this.anchorVideo = data.videoBox // 自己的视频播放元素
                 this.isLive = true;
-                // this.sendVideo(res.sendVideoId)
+                this.webRTC.getStream(this.localStream, (blob) => {
+                    console.log(blob)
+                    this.$socket.emit("liveVideStream", {
+                        socketId: this.socketId,
+                        video: blob.data,
+                        time: this.anchorVideo.currentTime
+                    })
+                }, 1000)
             }).catch(err => {
                 console.log("无可调用设备", err)
             });
         },
         // 结束直播
         overLive() {
-            // let tracks = this.anchorVideo.srcObject.getTracks();
-            // tracks[0].stop();
-            // window.URL.revokeObjectURL(this.anchorVideo.src);
-            // console.log(1);
             this.webRTC.closeCamera(this.anchorVideo);
             this.isLive = false;
         },
@@ -100,7 +109,9 @@ export default {
         // window.onbeforeunload = function () {
         //     return '1111111';
         // }
-        // this.overLive();
+        if (this.anchorVideo) {
+            this.overLive();
+        }
     }
 };
 </script>
