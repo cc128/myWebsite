@@ -24,25 +24,25 @@ export default {
         };
     },
     watch: {
-        "$store.state.socketId": function (v1, v2) {
-            if (v1) {
-                this.socketId = this.$store.state.socketId;
-                this.$socket.emit("userLink", {
-                    name: this.mYname,
-                    socketId: this.socketId,
-                    type: this.$route.name
-                }); //链接房间
-            }
-        },
+        // "$store.state.socketId": function (v1, v2) {
+        //     if (v1) {
+        //         this.socketId = this.$store.state.socketId;
+        //         this.$socket.emit("userLink", {
+        //             name: this.mYname,
+        //             socketId: this.socketId,
+        //             type: this.$route.name
+        //         }); //链接房间
+        //     }
+        // },
     },
     created() {
-        if (this.socketId) {
-            this.$socket.emit("userLink", {
-                name: this.mYname,
-                socketId: this.socketId,
-                type: this.$route.name
-            }); //链接房间
-        }
+        // if (this.socketId) {
+        //     this.$socket.emit("userLink", {
+        //         name: this.mYname,
+        //         socketId: this.socketId,
+        //         type: this.$route.name
+        //     }); //链接房间
+        // }
     },
     mounted() { },
     methods: {
@@ -51,7 +51,7 @@ export default {
             // 获取摄像头权限
             this.webRTC.getCamera("#anchor-video").then(data => {
                 this.socketId = this.$store.state.socketId;
-                this.$socket.emit("userLink", {
+                this.$socket.emit("linkLive", {
                     name: this.mYname,
                     socketId: this.socketId,
                     type: this.$route.name
@@ -76,6 +76,11 @@ export default {
         overLive() {
             this.webRTC.closeCamera(this.anchorVideo);
             this.isLive = false;
+            this.$socket.emit("overLive", {
+                name: this.mYname,
+                socketId: this.socketId,
+                type: this.$route.name
+            })
         },
         // async startVideo() {
         //     this.isLive = true;
