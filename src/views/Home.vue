@@ -6,6 +6,7 @@
 */
 <template>
     <div class="home">
+        {{ $store.state.socketId }}
         <div class="header-box">
             <el-menu class="home-menu" :default-active="activeIndex2" mode="horizontal" :collapse="false" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
                 <el-menu-item index="/video-call">
@@ -75,7 +76,7 @@
                 <i class="el-icon-edit" @click="setName"></i>
             </div>
         </div>
-        <div class="body-box">
+        <div v-if="isShow" class="body-box">
             <router-view />
         </div>
     </div>
@@ -85,6 +86,7 @@
 export default {
     data() {
         return {
+            isShow: false,
             mYname: sessionStorage.getItem("mYname") || "用户" + ("" + Math.random()).substr(0, 6).replace(".", ""),
             activeIndex2: this.$route.fullPath
         };
@@ -95,18 +97,18 @@ export default {
 
         //获取自己的id
         this.$socket.on("socketId", socketId => {
-            console.log("自己的id", socketId);
             this.$store.state.socketId = socketId;
-        });
-        // 获取链接房间得视频用户
-        this.$socket.on("videoCallUserList", list => {
-            console.log(list, "视频用户");
-            this.$store.state.videoCallUserList = list;
+            this.isShow = true;
         });
         // 获取链接房间得直播用户
         this.$socket.on("openLiveUserList", list => {
             console.log(list, "直播用户");
             this.$store.state.openLiveUserList = list;
+        });
+        // 获取链接房间得视频用户
+        this.$socket.on("videoCallUserList", list => {
+            console.log(list, "视频用户");
+            this.$store.state.videoCallUserList = list;
         });
     },
     methods: {

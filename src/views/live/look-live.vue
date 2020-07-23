@@ -11,7 +11,6 @@ export default {
             socketId: this.$store.state.socketId, //自己得id
             liveList: this.$store.state.openLiveUserList, //直播列表
             one: true,
-            socketId: null,
             mYname: sessionStorage.getItem("mYname") || null,
             video: null,
             mediaSource: null,
@@ -19,19 +18,19 @@ export default {
         };
     },
     watch: {
-        "$store.state.socketId": function (v1, v2) {
-            if (v1) {
-                this.socketId = this.$store.state.socketId;
-                this.$socket.emit("userLink", {
-                    name: this.mYname,
-                    socketId: this.socketId,
-                    type: this.$route.name
-                }); //链接房间
-            }
-        },
+        // "$store.state.socketId": function (v1, v2) {
+        //     if (v1) {
+        //         console.log(222222)
+        //         this.socketId = this.$store.state.socketId;
+        //         this.$socket.emit("userLink", {
+        //             name: this.mYname,
+        //             socketId: this.socketId,
+        //             type: this.$route.name
+        //         }); //链接房间
+        //     }
+        // },
         "$store.state.openLiveUserList": function (v1, v2) {
             if (v1) {
-                console.log("直播列表")
                 this.liveList = this.$store.state.openLiveUserList;
             }
         }
@@ -55,37 +54,35 @@ export default {
                 this.video.currentTime = data.time;
             }
         });
+        this.$socket.on("sendVideo", data => {
+            console.log("接收视频流", data.video)
+            this.sourceBuffer.appendBuffer(new Uint8Array(data.video));
+        })
     },
     methods: {
+        // 创建可添加视频流的url
         getVideo(el, e) {
-            console.log(e.target, e, 1111111)
-            // this.video = e.target;
-            // // // 创建可添加视频流的url
-            // this.mediaSource = new MediaSource();
-            // this.video.src = window.URL.createObjectURL(this.mediaSource);
-            // // // 创建可添加视频流的url
-            // this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
+            console.log(el.target)
+            // console.log(el.target, e, 1111111)
+            this.video = el.target;
+            this.mediaSource = new MediaSource();
+            this.video.src = window.URL.createObjectURL(this.mediaSource);
+            this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
+            this.$socket.emit("getVideo", {
+                socketId: this.socketId,
+                videoId: e.socketId,
+            })
         },
         // 接收视频流
         sourceOpen(e) {
-            this.sourceBuffer = this.mediaSource.addSourceBuffer(
-                "video/webm;codecs=vp9"
-            );
-            //视频流结束
-            this.sourceBuffer.addEventListener("updateend", () => {
-                this.mediaSource.endOfStream();
-                URL.revokeObjectURL(this.video.src);
-            });
-            URL.revokeObjectURL(this.video.src);
+            this.sourceBuffer = this.mediaSource.addSourceBuffer("video/webm;codecs=vp9");
+            // //视频流结束
+            // this.sourceBuffer.addEventListener("updateend", () => {
+            //     this.mediaSource.endOfStream();
+            //     URL.revokeObjectURL(this.video.src);
+            // });
+            // URL.revokeObjectURL(this.video.src);
         },
-        setPrompt() {
-            this.mYname = prompt("请输入昵称");
-            if (this.mYname) {
-                sessionStorage.setItem("mYname", this.mYname);
-            } else {
-                this.setPrompt();
-            }
-        }
     }
 };
 </script>

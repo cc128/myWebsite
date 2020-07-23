@@ -36,13 +36,13 @@ export default {
         // },
     },
     created() {
-        // if (this.socketId) {
-        //     this.$socket.emit("userLink", {
-        //         name: this.mYname,
-        //         socketId: this.socketId,
-        //         type: this.$route.name
-        //     }); //链接房间
-        // }
+        if (this.socketId) {
+            this.$socket.emit("userLink", {
+                name: this.mYname,
+                socketId: this.socketId,
+                type: this.$route.name
+            }); //链接房间
+        }
     },
     mounted() { },
     methods: {
@@ -67,7 +67,7 @@ export default {
                         video: blob.data,
                         time: this.anchorVideo.currentTime
                     })
-                }, 1000)
+                }, 5000)
             }).catch(err => {
                 console.log("无可调用设备", err)
             });
