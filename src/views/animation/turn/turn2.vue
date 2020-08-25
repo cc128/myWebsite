@@ -11,46 +11,45 @@
 <script>
 export default {
     props: {
-        num: {
+        time: {
             type: Number,
+            default: 2
+        },
+        num: {
+            type: [Number, String],
             default: 0
         }
     },
     data() {
         return {
             num1: this.num,
-            index: 0,
-            timeout: null
         };
     },
     watch: {
         num: function (v1, v2) {
+            clearInterval(this.Interval);
             this.setNum();
         },
-        index: function (v1, v2) {
-            // 小于50的值定时器执行的次数为当前传入值
-            // 大于等于50的值定时器执行的次数为50次
-            if (v1 === (this.num < 50 ? this.num : 50)) {
-                this.num1 = this.num;
-                clearInterval(this.Interval);
-                console.timeEnd("执行时间");
-            }
-        }
     },
-    created() { },
+    created() { 
+        this.setNum();
+    },
     methods: {
         setNum() {
-            this.Interval = setInterval(
-                () => {
-                    // 小于50的值定时器每次加1
-                    // 大于等于50的值定时器每次加等====传入值/1千毫秒*20毫秒
-                    this.num1 +=
-                        this.num < 50 ? 1 : parseInt((this.num / 1000) * 20);
-                    this.index++; //定时器累计执行次数
-                },
-                this.num < 50 ? 1000 / this.num : 20
-            );
             console.time("执行时间");
+            this.num1 = 0
+            this.Interval = setInterval(() => {
+                if (this.num / (this.time * 1000 / 80) < 1) {
+                    this.num1++;
+                } else {
+                    this.num1 += parseInt(this.num / (this.time * 1000 / 80));
+                }
+                if(this.num1 >= this.num) {
+                    this.num1 = this.num;
+                    clearInterval(this.Interval);
+                    console.timeEnd("执行时间");
+                }
+            }, 80);
         }
     }
 };

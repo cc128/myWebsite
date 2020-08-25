@@ -32,7 +32,7 @@ export default {
     data() {
         return {
             num: "654321",
-            num2: 0,
+            num2: 100,
             input: "",
             input2: "",
             isShow: true,
@@ -43,9 +43,9 @@ export default {
 
     },
     mounted() {
-        setTimeout(() => {
-            this.num2 = 60.45;
-        }, 500);
+        // setTimeout(() => {
+        //     this.num2 = 60.45;
+        // }, 500);
     },
     methods: {
         refresh() {
@@ -60,7 +60,7 @@ export default {
         },
         refresh2() {
             if (this.input2) {
-                this.num2 = this.input;
+                this.num2 = this.input2;
             } else {
                 this.isShow2 = false;
                 setTimeout(() => {
