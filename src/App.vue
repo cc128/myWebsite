@@ -12,5 +12,16 @@
     .el-menu.el-menu--horizontal {
         border: none;
     }
+    .isShow {
+        animation: isShow 1s linear;
+    }
+    @keyframes isShow {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
 }
 </style>

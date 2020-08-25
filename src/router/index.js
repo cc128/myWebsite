@@ -12,7 +12,12 @@ const routes = [
         children: [
             {
                 path: "/",
-                redirect: "/video-call"
+                redirect: "/animation"
+            },
+            {
+                path: "/animation",
+                name: "效果集合",
+                component: () => import("../views/animation/index.vue")
             },
             {
                 path: "/video-call",
