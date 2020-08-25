@@ -82,8 +82,6 @@ export default {
         .input {
             width: 200px;
         }
-        .btn {
-        }
     }
 }
 </style>
