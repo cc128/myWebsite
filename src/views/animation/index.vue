@@ -19,7 +19,22 @@
                     <el-button class="btn" type="primary" @click="refresh2">效果</el-button>
                 </div>
             </el-tab-pane>
+            <el-tab-pane label="签名">
+                <signature></signature>
+            </el-tab-pane>
+            <el-tab-pane label="弹幕">
+                <div style="height: 80vh">
+                    <barrage></barrage>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="文字动画">
+                <frame></frame>
+            </el-tab-pane>
+            <el-tab-pane label="树形控件">
+                <tree></tree>
+            </el-tab-pane>
         </el-tabs>
+
     </div>
 </template>
 
@@ -28,6 +43,10 @@ export default {
     components: {
         "turn1": () => import("./turn/turn1"),
         "turn2": () => import("./turn/turn2"),
+        "signature": () => import("./signature/signature"), //签名
+        "barrage": () => import("./barrage/barrage"), //弹幕
+        "frame": () => import("./frame/frame"), //文字
+        "tree": () => import("./tree/tree"), //树形控件
     },
     data() {
         return {
