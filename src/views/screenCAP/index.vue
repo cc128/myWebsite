@@ -34,7 +34,7 @@ export default {
                 this.elVideo.srcObject = stream;
                 this.isTranscribe = true;
             } catch {
-                alert(1);
+                // alert(1);
             }
             // .then(stream => {
             //     console.log(stream, 1);
