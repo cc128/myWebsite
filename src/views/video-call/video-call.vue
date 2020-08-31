@@ -40,9 +40,9 @@
                 </svg>-->
             </div>
         </div>
-        <video v-show="true" id="callVideo" autoplay></video>
+        <video v-show="this.callVideo" id="callVideo" autoplay></video>
         <!-- controls="controls" -->
-        <video v-show="true" id="calledVideo" autoplay="autoplay" muted="muted"></video>
+        <video v-show="this.calledVideo" id="calledVideo" autoplay="autoplay" muted="muted"></video>
     </div>
 </template>
 
@@ -214,7 +214,7 @@ export default {
                     });
                 }
             };
-            this.mediaRecorder.start(200);
+            this.mediaRecorder.start(300);
         },
         // 设置视频流格式
         sourceOpen(e) {
