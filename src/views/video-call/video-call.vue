@@ -130,7 +130,8 @@ export default {
                 })
 
             } else if (res.isConsent === false) {
-                this.webRTC.closeCamera(); // 关闭摄像头
+                this.webRTC.closeCamera(this.callVideo); // 关闭摄像头
+
                 // 挂断操作
                 this.who = 0;
                 this.stateText = "";
