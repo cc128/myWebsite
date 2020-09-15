@@ -6,9 +6,12 @@
 */
 <template>
     <div class="screenCAP-box">
+        <video id="upFileBox" width="300" height="150" controls="controls"></video>
+        <video id="upFileBox2" width="300" height="150" controls="controls"></video>
         <div class="start-transcribe">
-            <input v-if="!isTranscribe" type="button" value="开始录制" @click="startVCR" />
-            <input v-if="isTranscribe" type="button" value="结束录制" @click="overVCR" />
+            <input v-if="!isTranscribe" type="file" value="视频" @change="getVideoFile" />
+            <!-- <input v-if="!isTranscribe" type="button" value="开始录制" @click="startVCR" />
+            <input v-if="isTranscribe" type="button" value="结束录制" @click="overVCR" /> -->
         </div>
         <video v-show="isTranscribe" id="video" autoplay="autoplay"></video>
     </div>
@@ -18,12 +21,92 @@
 export default {
     data() {
         return {
+            upFileURL: null, // 上传文件路径
             isTranscribe: false,
-            elVideo: null
+            elVideo: null,
+            file: null, //文件
+            sectionVideo: [],
+            mediaSource: null,
+            sourceBuffer: null,
+            unitK: 1024 * 200
         };
     },
-    created() { },
+    created() {
+
+    },
     methods: {
+        getVideoFile(e) {
+            let video = document.querySelectorAll("#upFileBox")[0];
+            this.file = e.target.files[0];
+            video.src = window.URL.createObjectURL(this.file)
+            // 播放
+            video.onloadedmetadata = e => {
+                video.play();
+            };
+            // 视频切片
+            let reader = new FileReader();
+            reader.readAsArrayBuffer(this.file);
+            let forNum = parseInt(this.file.size / (1024 * this.unitK) + 1)
+            reader.addEventListener("load", (e) => {
+                console.log(e.target)
+                this.sectionVideo = [];
+                for (let i = 0; i < forNum; i++) {
+                    // //每10M切割一段,这里只做一个切割演示，实际切割需要循环切割，
+                    this.sectionVideo.push(e.target.result.slice(this.unitK * 1024 * i, this.unitK * 1024 * (i + 1)));
+                    // console.log(this.sectionVideo, 2)
+                    // console.log()
+                }
+                // console.log(this.sectionVideo, 3)
+                // window.URL.revokeObjectURL(video.src);
+                this.playSectionVideo();
+            })
+            // 视频切片
+
+
+
+            // let mediaRecorder = new MediaRecorder(this.file, {
+            //     mimeType: "video/webm;codecs=vp9"
+            // })
+            // // 500毫秒发送一次，视频流到后端
+            // this.mediaRecorder.ondataavailable = blob => {
+            //     console.log(blob, 111111);
+            // };
+            // this.mediaRecorder.start(100);
+            // console.log(mediaRecorder)
+            // // this.upFileURL = e.target.value;
+            // // console.log(this.upFileURL, 222222)
+        },
+        //播放切片视频
+        playSectionVideo() {
+            let video2 = document.querySelectorAll("#upFileBox2")[0];
+            this.mediaSource = new MediaSource();
+            video2.src = window.URL.createObjectURL(this.mediaSource);
+            this.mediaSource.addEventListener("sourceopen", this.sourceOpen, false)
+        },
+        sourceOpen() {
+            console.log(this.sectionVideo[0], 222222222)
+            this.sourceBuffer = this.mediaSource.addSourceBuffer(`video/mp4; codecs="avc1.4d401f,mp4a.40.2"`);
+            this.sourceBuffer.appendBuffer(new Uint8Array(this.sectionVideo[0]));
+            // setTimeout(() => {
+            //     this.sourceBuffer.appendBuffer(new Uint8Array(this.sectionVideo[1]));
+            // }, 1000);
+            // this.sourceBuffer.addEventListener("updateend", () => {
+            //     this.mediaSource.endOfStream();
+            //     // document.querySelectorAll("#upFileBox2")[0].play();
+            //     //console.log(mediaSource.readyState); // ended
+            // });
+            // var i = 0;
+            // let a = setInterval(() => {
+            //     if (i >= this.sectionVideo.length) {
+            //         clearInterval(a);
+            //         return;
+            //     }
+            //     console.log(this.sectionVideo[i], 111111)
+            //     this.sourceBuffer.appendBuffer(new Uint8Array(this.sectionVideo[i]));
+            //     i++;
+            // }, 1000);
+        },
+
         async startVCR() {
             try {
                 let stream = await navigator.mediaDevices.getDisplayMedia({
