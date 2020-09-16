@@ -6,6 +6,7 @@
 */
 <template>
     <div class="screenCAP-box">
+        <canvas id="canvas" width="900" height="450"></canvas>
         <video id="upFileBox" width="300" height="150" controls="controls"></video>
         <video id="upFileBox2" width="300" height="150" controls="controls"></video>
         <div class="start-transcribe">
@@ -28,7 +29,7 @@ export default {
             sectionVideo: [],
             mediaSource: null,
             sourceBuffer: null,
-            unitK: 1024 * 200
+            unitK: 1024 * 1024 * 20,
         };
     },
     created() {
@@ -38,73 +39,77 @@ export default {
         getVideoFile(e) {
             let video = document.querySelectorAll("#upFileBox")[0];
             this.file = e.target.files[0];
+            // console.log(this.file)
             video.src = window.URL.createObjectURL(this.file)
             // 播放
             video.onloadedmetadata = e => {
                 video.play();
+                switchToCanvas()
+                this.playSectionVideo();//播放切片视频
             };
-            // 视频切片
-            let reader = new FileReader();
-            reader.readAsArrayBuffer(this.file);
-            let forNum = parseInt(this.file.size / (1024 * this.unitK) + 1)
-            reader.addEventListener("load", (e) => {
-                console.log(e.target)
-                this.sectionVideo = [];
-                for (let i = 0; i < forNum; i++) {
-                    // //每10M切割一段,这里只做一个切割演示，实际切割需要循环切割，
-                    this.sectionVideo.push(e.target.result.slice(this.unitK * 1024 * i, this.unitK * 1024 * (i + 1)));
-                    // console.log(this.sectionVideo, 2)
-                    // console.log()
+            let canvas = document.getElementById("canvas");
+            let context = canvas.getContext("2d");
+            let switchToCanvas = () => {
+                if (video.ended) {
+                    this.mediaRecorder.stop();
+                    return;
                 }
-                // console.log(this.sectionVideo, 3)
-                // window.URL.revokeObjectURL(video.src);
-                this.playSectionVideo();
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                window.requestAnimationFrame(switchToCanvas);
+            }
+            const stream = canvas.captureStream(60); // 60 FPS recording
+            this.mediaRecorder = new MediaRecorder(stream, {
+                mimeType: "video/webm;codecs=vp8"
             })
-            // 视频切片
+            // 500毫秒发送一次，视频流到后端
+            this.mediaRecorder.ondataavailable = blob => {
+                console.log(blob.data, 111111);
+                // this.sourceBuffer.appendBuffer(new Uint8Array(blob.data));
+                let reader = new FileReader();
+                reader.readAsArrayBuffer(blob.data);
+                reader.addEventListener("load", (e) => {
+                    this.sourceBuffer.appendBuffer(new Uint8Array(e.target.result));
+                })
+
+            };
+            this.mediaRecorder.start(16);
 
 
-
-            // let mediaRecorder = new MediaRecorder(this.file, {
-            //     mimeType: "video/webm;codecs=vp9"
+            // // 视频切片
+            // let reader = new FileReader();
+            // reader.readAsArrayBuffer(this.file);
+            // let forNum = parseInt(this.file.size / this.unitK + 1)
+            // reader.addEventListener("load", (e) => {
+            //     this.sectionVideo = [];
+            //     for (let i = 0; i < forNum; i++) {
+            //         // //每10M切割一段,这里只做一个切割演示，实际切割需要循环切割，
+            //         // this.sectionVideo.push(e.target.result.slice(this.unitK * i, this.unitK * (i + 1)));
+            //         this.sectionVideo.push(e.target.result.slice(0, 1024 * 1024 * 10));
+            //     }
+            //     // console.log(this.sectionVideo, 3)
+            //     // // window.URL.revokeObjectURL(video.src);
+            //     // this.playSectionVideo();
             // })
-            // // 500毫秒发送一次，视频流到后端
-            // this.mediaRecorder.ondataavailable = blob => {
-            //     console.log(blob, 111111);
-            // };
-            // this.mediaRecorder.start(100);
-            // console.log(mediaRecorder)
-            // // this.upFileURL = e.target.value;
-            // // console.log(this.upFileURL, 222222)
+            // // 视频切片
+
+
+
+
         },
         //播放切片视频
         playSectionVideo() {
             let video2 = document.querySelectorAll("#upFileBox2")[0];
+            // // 播放
+            video2.onloadedmetadata = e => {
+                video2.play();
+            };
             this.mediaSource = new MediaSource();
             video2.src = window.URL.createObjectURL(this.mediaSource);
-            this.mediaSource.addEventListener("sourceopen", this.sourceOpen, false)
+            this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
         },
         sourceOpen() {
-            console.log(this.sectionVideo[0], 222222222)
-            this.sourceBuffer = this.mediaSource.addSourceBuffer(`video/mp4; codecs="avc1.4d401f,mp4a.40.2"`);
-            this.sourceBuffer.appendBuffer(new Uint8Array(this.sectionVideo[0]));
-            // setTimeout(() => {
-            //     this.sourceBuffer.appendBuffer(new Uint8Array(this.sectionVideo[1]));
-            // }, 1000);
-            // this.sourceBuffer.addEventListener("updateend", () => {
-            //     this.mediaSource.endOfStream();
-            //     // document.querySelectorAll("#upFileBox2")[0].play();
-            //     //console.log(mediaSource.readyState); // ended
-            // });
-            // var i = 0;
-            // let a = setInterval(() => {
-            //     if (i >= this.sectionVideo.length) {
-            //         clearInterval(a);
-            //         return;
-            //     }
-            //     console.log(this.sectionVideo[i], 111111)
-            //     this.sourceBuffer.appendBuffer(new Uint8Array(this.sectionVideo[i]));
-            //     i++;
-            // }, 1000);
+            // this.sourceBuffer = this.mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+            this.sourceBuffer = this.mediaSource.addSourceBuffer('video/webm;codecs=vp8');
         },
 
         async startVCR() {
@@ -154,8 +159,8 @@ export default {
     background: #ccc;
     position: relative;
     .start-transcribe {
-        width: 100%;
-        height: 100%;
+        // width: 100%;
+        // height: 100%;
         position: absolute;
         top: 0;
         left: 0;
