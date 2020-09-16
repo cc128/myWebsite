@@ -1,11 +1,11 @@
 <template>
     <div class="animation-box">
         <el-tabs v-model="activeName" type="border-card">
-            <el-tab-pane label="翻拍(2种)" :name="1">
+            <el-tab-pane label="翻拍(2种)" name="1">
                 <el-divider>效果1</el-divider>
                 <div class="turn1">
                     <div style="width: 50%;">
-                        <turn1 v-if="isShow && activeName === 1" :num="num"></turn1>
+                        <turn1 v-if="isShow && activeName === '1'" :num="num"></turn1>
                     </div>
                     <el-input v-model="input" class="input" placeholder="请输入"></el-input>
                     <el-button class="btn" type="primary" @click="refresh">效果</el-button>
@@ -13,25 +13,25 @@
                 <el-divider>效果2</el-divider>
                 <div class="turn1">
                     <div style="width: 50%;">
-                        <turn2 v-if="isShow2 && activeName === 1" :num="num2"></turn2>
+                        <turn2 v-if="isShow2 && activeName === '1'" :num="num2"></turn2>
                     </div>
                     <el-input v-model="input2" class="input" placeholder="请输入"></el-input>
                     <el-button class="btn" type="primary" @click="refresh2">效果</el-button>
                 </div>
             </el-tab-pane>
-            <el-tab-pane label="签名" :name="2">
-                <signature v-if="activeName === 2"></signature>
+            <el-tab-pane label="签名" name="2">
+                <signature v-if="activeName === '2'"></signature>
             </el-tab-pane>
-            <el-tab-pane label="弹幕" :name="3">
+            <el-tab-pane label="弹幕" name="3">
                 <div style="height: 80vh">
-                    <barrage v-if="activeName === 3"></barrage>
+                    <barrage v-if="activeName === '3'"></barrage>
                 </div>
             </el-tab-pane>
-            <el-tab-pane label="文字动画" :name="4">
-                <frame v-if="activeName === 4"></frame>
+            <el-tab-pane label="文字动画" name="4">
+                <frame v-if="activeName === '4'"></frame>
             </el-tab-pane>
-            <el-tab-pane label="树形控件" :name="5">
-                <tree v-if="activeName === 5"></tree>
+            <el-tab-pane label="树形控件" name="5">
+                <tree v-if="activeName === '5'"></tree>
             </el-tab-pane>
         </el-tabs>
 
@@ -50,7 +50,7 @@ export default {
     },
     data() {
         return {
-            activeName: 1,
+            activeName: "1",
             num: "654321",
             num2: 100,
             input: "",

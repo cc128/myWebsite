@@ -22,7 +22,7 @@
                     <svg t="1592300869012" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2661" width="15" height="15"><path d="M113.27683429 155.94627634l799.4199333 0c44.24124361 0 80.02419363 35.50497793 80.02419365 79.74225054 0 20.57390573-7.89043628 39.17023849-20.57390572 53.25945242l-395.33984827 527.4996929c-26.49074017 34.93712067-76.36290417 42.2676418-111.58990998 15.78087266-6.20274865-4.5110899-11.55172587-9.86403813-15.78087266-15.78087266L49.59342845 283.31308797c-26.20482607-34.9410917-19.15624802-85.09519879 16.0628158-111.30399583C80.03137236 161.01728144 96.65410329 155.94627634 113.27683429 155.94627634L113.27683429 155.94627634z" p-id="2662" fill="#0287DC"></path></svg>
                 </div>
             </div>
-            <div class="scroll-box" :style="{'max-height': active === i ? '' : 0}">
+            <div class="scroll-box" :style="{'height': active === i ? item.children.length * 42 + 'px' : 0}">
                 <!-- <div v-if="item.children.length > 1" class="search-box">
                     <slot :row="item">
                         <el-input class="input" v-model="query" placeholder="请输入搜素内容" size="mini" @keydown.native.enter.prevent="filterList"></el-input>
@@ -63,6 +63,7 @@ export default {
                         lable: "一级1",
                         children: [
                             {
+                                value: 11,
                                 lable: "一级1-1"
                             },
                             {
@@ -76,42 +77,6 @@ export default {
                             {
                                 value: 14,
                                 lable: "一级1-4"
-                            },
-                            {
-                                value: 15,
-                                lable: "一级1-5"
-                            },
-                            {
-                                value: 16,
-                                lable: "一级1-6"
-                            },
-                            {
-                                value: 17,
-                                lable: "一级1-7"
-                            },
-                            {
-                                value: 18,
-                                lable: "一级1-8"
-                            },
-                            {
-                                value: 19,
-                                lable: "一级1-9"
-                            },
-                            {
-                                value: 20,
-                                lable: "一级1-10"
-                            },
-                            {
-                                value: 21,
-                                lable: "一级1-11"
-                            },
-                            {
-                                value: 22,
-                                lable: "一级1-12"
-                            },
-                            {
-                                value: 23,
-                                lable: "一级1-13"
                             }
                         ]
                     },
@@ -120,8 +85,24 @@ export default {
                         lable: "一级2",
                         children: [
                             {
+                                value: 21,
+                                lable: "一级 2-1",
+                            },
+                            {
                                 value: 22,
-                                lable: "一级 2-1"
+                                lable: "一级1-5"
+                            },
+                            {
+                                value: 23,
+                                lable: "一级1-6"
+                            },
+                            {
+                                value: 24,
+                                lable: "一级1-7"
+                            },
+                            {
+                                value: 25,
+                                lable: "一级1-8"
                             }
                         ]
                     },
@@ -305,7 +286,6 @@ export default {
         cursor: pointer;
         .scroll-box {
             transition: all 0.2s ease-in;
-            max-height: 300px;
             overflow-y: auto;
             &::-webkit-scrollbar {
                 width: 5px;
