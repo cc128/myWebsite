@@ -41,13 +41,12 @@ export default {
         getVideoFile(e) {
             this.video = document.querySelectorAll("#upFileBox")[0];
             this.file = e.target.files[0];
-            // console.log(this.file)
             this.video.src = window.URL.createObjectURL(this.file)
             // 播放
             this.video.onloadedmetadata = e => {
                 this.video.play();
                 this.playSectionVideo();//播放切片视频
-                let stream = this.canvasVideo(); //把视频绘制在canvas上
+                let stream = this.canvasVideo(this.video); //把视频绘制在canvas上
                 this.createVideoStream(stream); //创建视频流
             };
             // this.video.ontimeupdate = () => {
@@ -81,21 +80,21 @@ export default {
             // // 视频切片
         },
         // 把视频绘制在canvas上
-        canvasVideo() {
+        canvasVideo(el) {
             let canvas = document.getElementById("canvas");
             let context = canvas.getContext("2d");
             let switchToCanvas = () => {
-                if (this.video.ended) {
-                    this.mediaRecorder.stop();
-                    this.video2.pause();
-                    return;
-                }
-                // if (this.video.paused) {
+                // if (el.ended) {
+                //     this.mediaRecorder.stop();
+                //     this.video2.pause();
+                //     return;
+                // }
+                // if (el.paused) {
                 //     console.log(222)
                 // } else {
                 //     console.log(333)
                 // }
-                context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+                context.drawImage(el, 0, 0, canvas.width, canvas.height);
                 this.dh = window.requestAnimationFrame(switchToCanvas);
             }
             const stream = canvas.captureStream(60); // 60 FPS recording
@@ -114,7 +113,7 @@ export default {
                 let reader = new FileReader();
                 reader.readAsArrayBuffer(blob.data);
                 reader.addEventListener("load", (e) => {
-                    console.log(111)
+                    // console.log(111)
                     this.sourceBuffer.appendBuffer(new Uint8Array(e.target.result));
                 })
 
@@ -139,32 +138,24 @@ export default {
         },
 
         async startVCR() {
-            navigator.mediaDevices.getDisplayMedia({
-                video: true,
-                cursor: "always"
-            })
-            // try {
-            //     let stream = await navigator.mediaDevices.getDisplayMedia({
-            //         video: true,
-            //         cursor: "always"
-            //     });
-            //     this.elVideo = document.getElementById("video");
-            //     this.elVideo.srcObject = stream;
-            //     this.isTranscribe = true;
-            // } catch {
-            //     alert(1);
-            // }
-            // .then(stream => {
-            //     console.log(stream, 1);
-            //     this.isTranscribe = true;
-            //     this.$nextTick(() => {
-            //         this.elVideo = document.querySelector("video");
-            //         this.elVideo.srcObject = stream;
-            //     });
-            // })
-            // .catch(err => {
-            //     console.log(err, 2);
-            // });
+            let vcr = null;
+            try {
+                vcr = await navigator.mediaDevices.getDisplayMedia(
+                    {
+                        video: true,
+                        cursor: "always"
+                    }
+                );
+            } catch (err) {
+                console.error("错误: " + err);
+            }
+            this.elVideo = document.getElementById("video");
+            this.elVideo.srcObject = vcr;
+            this.isTranscribe = true;
+            this.playSectionVideo();//播放切片视频
+            let stream = this.canvasVideo(this.elVideo); //把视频绘制在canvas上
+            this.createVideoStream(stream); //创建视频流
+            console.log(stream);
         },
         overVCR() {
             let tracks = this.elVideo.srcObject.getTracks();
@@ -217,8 +208,8 @@ export default {
         left: 0;
     }
     #video {
-        width: 160px;
-        height: 90px;
+        width: 300px;
+        height: 150px;
         background: red;
         // max-width: 100%;
         // max-height: 100%;
