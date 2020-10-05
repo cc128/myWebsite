@@ -33,6 +33,9 @@
             <el-tab-pane label="树形控件" name="5">
                 <tree v-if="activeName === '5'"></tree>
             </el-tab-pane>
+            <el-tab-pane label="白板" name="6">
+                <whiteBoard v-if="activeName === '6'"></whiteBoard>
+            </el-tab-pane>
         </el-tabs>
 
     </div>
@@ -47,10 +50,11 @@ export default {
         "barrage": () => import("./barrage/barrage"), //弹幕
         "frame": () => import("./frame/frame"), //文字
         "tree": () => import("./tree/tree"), //树形控件
+        "whiteBoard": () => import("./whiteBoard"), //白板
     },
     data() {
         return {
-            activeName: "1",
+            activeName: "6",
             num: "654321",
             num2: 100,
             input: "",
