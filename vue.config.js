@@ -14,15 +14,15 @@ module.exports = {
     //第三方依赖剥离
     configureWebpack: {},
     //代理服务器配置
-    devServer: {
-        proxy: {
-            "/": {
-                target: "http://mvi.xrdata.net/draw/evaluation", //线上
-                ws: false,
-                changeOrigin: true
-            }
-        }
-    },
+    // devServer: {
+    //     proxy: {
+    //         "/": {
+    //             target: "http://mvi.xrdata.net/draw/evaluation", //线上
+    //             ws: false,
+    //             changeOrigin: true
+    //         }
+    //     }
+    // },
     // publicPath: "/video2",
     publicPath: "./",
     outputDir: "dist",

@@ -12,7 +12,7 @@ const routes = [
         children: [
             {
                 path: "/",
-                redirect: "/animation"
+                redirect: "/map"
             },
             {
                 path: "/animation",
@@ -48,6 +48,11 @@ const routes = [
                 path: "/screenCAP",
                 name: "录屏",
                 component: () => import("../views/screenCAP")
+            },
+            {
+                path: "/map",
+                name: "地图",
+                component: () => import("../views/map")
             }
         ]
     }
