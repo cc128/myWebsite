@@ -97,10 +97,8 @@ export default {
         // 初始化
         init() {
             this.canvas = document.querySelector("#myCanvas");
-            this.canvas.width =
-                this.width || this.canvas.parentNode.clientWidth;
-            this.canvas.height =
-                this.height || this.canvas.parentNode.clientHeight;
+            this.canvas.width = this.width || this.canvas.parentNode.clientWidth;
+            this.canvas.height = this.height || this.canvas.parentNode.clientHeight;
             this.ctx = this.canvas.getContext("2d");
             this.ctx.lineWidth = 1;
         }
