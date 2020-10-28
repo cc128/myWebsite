@@ -16,7 +16,9 @@ export default {
         return {};
     },
     computed: {},
-    created() { },
+    created() {
+        console.log(returnCitySN['cip'], 2222)
+    },
     mounted() { },
     watch: {},
     methods: {},
