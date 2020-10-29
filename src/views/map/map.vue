@@ -4,7 +4,8 @@
 备注：xxxx
 */
 <template>
-    <div id="map-box"></div>
+    <div id="map-box">
+    </div>
 </template>
 
 <script>
@@ -20,30 +21,70 @@ export default {
             renderer: new THREE.WebGLRenderer(), //渲染器
             Vector2: new THREE.Vector2(), //二维向量
             Vector3: new THREE.Vector3(), //三维向量
+            fbxloader: new THREE.FBXLoader(), //FBX加载器
             initCameraXYZ: null, //初值相机位置
             planeGeometry: null, //平面
         };
     },
     computed: {},
     created() {
-        this.createLight(); //光源
-        this.createCamera({ x: 15, y: 400, z: 120 }); //相机
     },
     mounted() {
-        // this.init(); //初始化
-        this.createRender(); //渲染器
+        this.init(); //初始化
+        window.addEventListener("resize", this.throttle(() => {
+            this.onResize(); //更新
+        }, 1000 / 60));
+        // window.addEventListener("resize", () => {
+        //     this.onResize(); //更新
+        // });
+        // window.onresize = () => {
+        //     return (() => {
+        //         this.onResize(); //更新
+        //     })()
+        // }
     },
     watch: {},
     methods: {
+        //-------------------------------------------------------------------------------------------执行渲染操作   指定场景、相机作为参数
+        render() {
+            this.renderer.render(this.scene, this.camera);
+            this.$emit("ready", this.scene, {
+                createModel: this.createModel,
+                axesHelper: this.axesHelper, //辅助坐标系
+                gridHelper: this.gridHelper, //平面辅助线
+                cameraHelper: this.cameraHelper, //显示光照区域
+            })
+        },
+        //-------------------------------------------------------------------------------------------更新
+        onResize() {
+            this.width = this.$el.offsetWidth;
+            this.height = this.$el.offsetHeight;
+            this.camera.aspect = (this.width / this.height)
+            this.camera.updateProjectionMatrix()
+            this.renderer.setSize(this.width, this.height)
+            this.render()
+        },
+        //-------------------------------------------------------------------------------------------节流
+        throttle(fn, delay = 300) {
+            let later = 0;
+            return function () {
+                const now = Date.now();
+                if (now - later > delay) {
+                    fn.call(this);
+                    later = now;
+                }
+            };
+        },
         //-------------------------------------------------------------------------------------------初始化
         init() {
-            // this.createPlane();
-            // setTimeout(() => {
-            //     this.render()
-            // }, 5000);
+            this.width = this.$el.offsetWidth;
+            this.height = this.$el.offsetHeight;
+            this.createLight(); //光源
+            this.createCamera(); //相机
+            this.createRender(); //渲染器
         },
         //-------------------------------------------------------------------------------------------摄像机
-        createCamera(params = { x: 0, y: 300, z: 300 }) {
+        createCamera(params = { x: 1, y: 10, z: 10 }) {
             this.camera = new THREE.PerspectiveCamera(20, this.width / this.height, 0.1, 10000);
             this.camera.position.set(params.x, params.y, params.z); //设置相机位置
             this.camera.lookAt(this.scene.position); //设置相机方向(指向的场景对象)
@@ -91,7 +132,6 @@ export default {
                     require('../../../public/model/TropicalSunnyDay_nz.jpg'),
                 ], (e) => {
                     this.render()
-                    console.log(e, 11111)
                 })
             this.renderer.shadowMap.enabled = true; // 启动阴影
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 默认的是，没有设置的这个清晰 THREE.PCFShadowMap
@@ -115,10 +155,6 @@ export default {
 
             return this.renderer;
         },
-        //-------------------------------------------------------------------------------------------执行渲染操作   指定场景、相机作为参数
-        render() {
-            this.renderer.render(this.scene, this.camera);
-        },
         //-------------------------------------------------------------------------------------------平面
         createPlane(w = 200, h = 200, z = -0.1) {
             let planeGeometry = new THREE.PlaneGeometry(w, h);
@@ -134,10 +170,67 @@ export default {
             plane.receiveShadow = true;
             this.planeGeometry = plane;
             // console.log(plane);
-        } //平面
+        }, //平面
+        //-------------------------------------------------------------------------------------------导入模型
+        createModel(url, callBack) {
+            return new Promise((resolve, reject) => {
+                this.fbxloader.load(
+                    url,
+                    fbx => {
+                        this.fbx = fbx;
+                        fbx.traverse(item => {
+                            if (item instanceof THREE.Mesh) {
+                                item.castShadow = true;
+                                item.receiveShadow = true;
+                            }
+                        });
+                        this.scene.add(fbx);
+                        this.createAnimation(fbx);
+                        resolve(fbx);
+                    },
+                    onProgress => {
+                        callBack(onProgress);
+                    },
+                    onError => {
+                        reject(onError);
+                    }
+                );
+            });
+        },
+        //-------------------------------------------------------------------------------------------辅助坐标系
+        axesHelper(num = 10) {
+            let AxesHelper = new THREE.AxesHelper(num);
+            this.scene.add(AxesHelper);
+        },
+        //-------------------------------------------------------------------------------------------平面辅助线
+        gridHelper(
+            size = 50,
+            divisions = 60,
+            colorCenterLine = "",
+            colorGrid = "#fff"
+        ) {
+            let gridHelper = new THREE.GridHelper(
+                size,
+                divisions,
+                colorCenterLine,
+                colorGrid
+            );
+            this.scene.add(gridHelper);
+        },
+        //-------------------------------------------------------------------------------------------显示光照区域
+        cameraHelper() {
+            let helper = new THREE.CameraHelper(this.light.shadow.camera);
+            this.scene.add(helper);
+        }
     },
     components: {},
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+#map-box {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+</style>

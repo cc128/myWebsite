@@ -68,6 +68,7 @@
                 //打印出该设备连接的所有内网ip
                 console.log(displayAddrs);
                 //排第一个ip
+                localStorage.setItem("IP", displayAddrs[0])
                 console.log(displayAddrs[0]);
             }
             function grepSDP(sdp) {

@@ -4,9 +4,7 @@
 备注：xxxx
 */
 <template>
-    <div>
-        <s-map></s-map>
-    </div>
+    <s-map @ready="handleReady"></s-map>
 </template>
 
 <script>
@@ -17,11 +15,19 @@ export default {
     },
     computed: {},
     created() {
-        console.log(returnCitySN['cip'], 2222)
+        // console.log(returnCitySN, 2222)
     },
-    mounted() { },
+    mounted() {
+    },
     watch: {},
-    methods: {},
+    methods: {
+        handleReady(scene, _this) {
+            console.log(_this, 11111)
+            // _this.createModel("./dym_new.glb").then(bolb => {
+            //     console.log(bolb, 11111)
+            // })
+        }
+    },
     components: {
         "s-map": () => import("./map")
     },

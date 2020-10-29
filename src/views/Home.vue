@@ -189,6 +189,7 @@ export default {
         }
     }
     .body-box {
+        max-height: calc(100vh - 60px);
         // width: 1200px;
         // background: red;
         // margin: 20px auto;
