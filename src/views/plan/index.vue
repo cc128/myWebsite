@@ -82,6 +82,7 @@ export default {
         },
         // 鼠标移入
         mouseenter(e) {
+            this.isRightKey = true;
             this.conEl = e.target; //存鼠标移入的元素
         },
         // 鼠标移开
@@ -90,6 +91,7 @@ export default {
         },
         // 滚轮事件
         mousewheel(e) {
+            if(this.elScale <= 0.3) return;
             if (e.deltaY > 0) {
                 this.conEl.style.transform = `scale(${this.elScale -= 0.1})`; //缩小
             } else {
