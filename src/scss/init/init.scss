@@ -1,3 +1,4 @@
+@charset "utf-8";
 * {
     margin: 0;
     padding: 0;
@@ -19,4 +20,7 @@ input,
 textarea {
     outline: none;
     padding: 0;
+}
+.anchorBL {
+    display: none;
 }

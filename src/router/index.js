@@ -12,7 +12,7 @@ const routes = [
         children: [
             {
                 path: "/",
-                redirect: "/map"
+                redirect: "/plan"
             },
             {
                 path: "/animation",
@@ -53,6 +53,11 @@ const routes = [
                 path: "/map",
                 name: "地图",
                 component: () => import("../views/map")
+            },
+            {
+                path: "/plan",
+                name: "平面图",
+                component: () => import("../views/plan")
             }
         ]
     }
