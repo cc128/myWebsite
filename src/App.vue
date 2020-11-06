@@ -17,12 +17,12 @@ export default {
     },
     mounted() {
         this.$nextTick(() => {
-            this.x = (document.body.offsetWidth / 1920);
-            this.y = (document.body.offsetHeight / 1080);
-            window.addEventListener("resize", () => {
-                this.x = (document.body.offsetWidth / 1920);
-                this.y = (document.body.offsetHeight / 1080);
-            });
+            // this.x = (document.body.offsetWidth / 1920);
+            // this.y = (document.body.offsetHeight / 1080);
+            // window.addEventListener("resize", () => {
+            //     this.x = (document.body.offsetWidth / 1920);
+            //     this.y = (document.body.offsetHeight / 1080);
+            // });
         })
     },
     methods: {}

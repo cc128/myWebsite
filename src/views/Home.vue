@@ -6,7 +6,7 @@
 */
 <template>
     <div class="home">
-        <div class="header-box">
+        <div v-if="false" class="header-box">
             <el-menu class="home-menu" :default-active="activeIndex2" mode="horizontal" :collapse="false" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
                 <!-- <el-menu-item index="/animation">
                     <div @click="toUrl('/animation')">

@@ -13,12 +13,12 @@
         </div>
         <div class="list">
             <div v-for="(item, i) in drawing" :key="i">
-                <div>名字{{ item.name }} / 宽度{{ item.width }} / 高度{{ item.height }} / x{{ item.left }} / y{{ item.top }}</div>
+                <div>宽度{{ item.width }} / 高度{{ item.height }} / x{{ item.left }} / y{{ item.top }}</div>
             </div>
         </div>
-        <div class="right-key">
-            <div>删除</div>
-        </div>
+        <ul v-show="isShow" class="right-key">
+            <li @click="deleEl">删除</li>
+        </ul>
     </div>
 </template>
 
@@ -27,13 +27,19 @@ export default {
     props: {},
     data() {
         return {
+            moverW: 0, //移动宽度
+            moverL: 0, //下移值
+            moverT: 0, // 上移值
+            ELid: "", //当前元素的唯一标识
+            rightKeyEl: null, //右键菜单
+            isShow: false, //右键菜单
             drawing: [], //图纸-存储所有操作信息
             loading: false,
             elScale: 1, // 缩放比例
             planContainer: "", //图层容器
             div: null, //
             isRightKey: false, // 右键是否按下
-            conEl: null, // 存储右键元素
+            conEl: null, // 存储元素
             rightKeyX: 0, //鼠标右键按下的x点
             rightKeyY: 0, //鼠标右键按下的y点
             left: 0, //容器外的距离
@@ -49,6 +55,7 @@ export default {
     mounted() {
         this.div = document.getElementsByClassName("plan")[0];
         this.planContainer = document.getElementsByClassName("plan-container")[0];
+        this.rightKeyEl = document.getElementsByClassName("right-key")[0];
         // 右键菜单
         this.div.oncontextmenu = (e) => {
             e.preventDefault();
@@ -76,9 +83,10 @@ export default {
     methods: {
         // 鼠标按下
         mousedown(e) {
-            // console.log(e)
+            this.isShow = false;
             e.preventDefault();
             if (e.button === 0) {
+                e.target.style.cursor = "move";
                 //左键
                 this.isRightKey = true;
                 this.rightKeyX = e.offsetX;
@@ -87,7 +95,6 @@ export default {
                 this.top = e.clientY - this.rightKeyY;
                 // this.conEl = e.target; //存左键的元素
                 e.target.style.position = "absolute";
-                // console.log(e.offsetX)
             }
             // //右键
             // this.isRightKey = true;
@@ -101,30 +108,47 @@ export default {
         },
         // 鼠标松开
         mouseup(e) {
+            e.target.style.cursor = "pointer";
             if (e.button === 0) {
                 this.isRightKey = false;
                 this.resultX = e.clientX - this.rightKeyX - this.left + this.resultX; // 计算移动距离
                 this.resultY = e.clientY - this.rightKeyY - this.top + this.resultY; // 计算移动距离
             } else if (e.button === 2) {
-                alert(1)
+                this.isShow = true;
+                this.rightKeyEl.style.left = e.clientX + 10 + "px";
+                this.rightKeyEl.style.top = e.clientY + 10 + "px";
             }
         },
         // 鼠标移动
         mousemove(e) {
+            // e.target.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
+            // this.centralPointXY
+            // 判断移入的元素是否为图片
+            if (e.path[0].getAttribute("src")) {
+                // e.style.transformOrigin = "center";
+                // console.log(e.offsetX, e.offsetY, this.centralPointXY)
+            }
+            // console.log(e.path[0].getAttribute("src"))
             if (this.isRightKey && e.button === 0) {
                 let left = e.clientX - this.rightKeyX - this.left + this.resultX; // 计算移动距离
                 let top = e.clientY - this.rightKeyY - this.top + this.resultY; // 计算移动距离
                 // if (left <= 0) left = 0;
                 // if (top <= 0) top = 0;
-                e.target.style.left = left + "px"
-                e.target.style.top = top + "px"
+                // e.target.style.left = left + "px";
+                // e.target.style.top = top + "px";
+                // 更新数据
+                let index = this.getIndex();
+                this.drawing[index].left = left;
+                this.drawing[index].top = top;
             }
         },
         // 鼠标移入
         mouseenter(e) {
+            this.ELid = e.path[0].getAttribute("id"); // 获取唯一标识
             // this.isRightKey = true;
-            // this.conEl = e.target; //存鼠标移入的元素
+            this.conEl = e.target; //存鼠标移入的元素
             e.target.style.boxShadow = "0 0 10px #fff";
+            e.target.style.cursor = "pointer";
             // e.preventDefault();
         },
         // 鼠标移开
@@ -134,28 +158,59 @@ export default {
         },
         // 滚轮事件
         mousewheel(e) {
-            // if (this.ctrlKey) {
-            e.target.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
-            e.target.style.position = "absolute";
-            // console.log(`${e.offsetX}px ${e.offsetY}px`)
-            // let w = (e.target.offsetWidth * this.elScale - e.target.offsetWidth) / 2;
-            // let h = (e.target.offsetHeight * this.elScale - e.target.offsetHeight) / 2;
-            // e.target.style.transformOrigin = `${e.offsetX - w}px ${e.offsetY - h}px`;
-            // console.log(w, h)
-            console.log(e.target.offsetWidth / e.target.offsetHeight)
+            // let Xdirection = e.offsetX < (e.target.offsetWidth - e.offsetX) ? "左" : "有"
+            // let Ydirection = e.offsetY < (e.target.offsetHeight - e.offsetY) ? "上" : "下"
+            // let arr = [e.offsetX, (e.target.offsetWidth - e.offsetX)]
+            // arr.sort((a, b) => {
+            //     return a - b
+            // })
+            // let arr2 = [e.offsetY, (e.target.offsetHeight - e.offsetY)]
+            // arr2.sort((a, b) => {
+            //     return a - b
+            // })
+            // let Lratio = (arr[0] / arr[1]).toFixed(2); //鼠标在元素上左右距离的比例 -- 结果为左移动的倍数
+            // let Rratio = (arr2[0] / arr2[1]).toFixed(2); //鼠标在元素上左右距离的比例 -- 结果为左移动的倍数
+            // let ratio = e.target.offsetWidth / e.target.offsetHeight * 10; //长宽比例*10 --用于计算top移动距离
+            // let w = ratio * (Xdirection === "左" ? (1 - Lratio) : Lratio); //-----------------------------------------------图片每次放大多少个px
+            // let left = w / 2 * (Xdirection === "左" ? Lratio : (1 - Lratio)); //----------------------------------------图片缩放时向左移动的距离
+            // let top = (w / 2 / (w / 10)) * (Ydirection === "上" ? Rratio : (1 - Rratio)); //------------------------图片缩放时向上移动的距离
+
+            // // let ratio = e.target.offsetWidth / e.target.offsetHeight * 10; //长宽比例*10 --用于计算top移动距离
+            // // let w = ratio; //-----------------------------------------------图片每次放大多少个px
+            // // let left = w / 2; //----------------------------------------图片缩放时向左移动的距离
+            // // let top = (w / 2 / (w / 10)); //------------------------图片缩放时向上移动的距离
+
+
+            // // if (this.ctrlKey) {
+            // e.target.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
+            // this.centralPointXY = [e.offsetX, e.offsetY];
+
+            // e.target.style.position = "absolute";
+            let w = e.target.offsetWidth;
             if (e.deltaY > 0) {
+                w = w - 20;
                 this.elScale -= 0.04
-                if (this.elScale <= 0.3) this.elScale = 0.3;
+                // if (this.elScale <= 0.3) this.elScale = 0.3;
                 // e.target.style.transform = `scale(${this.elScale})`; //缩小
-                e.target.style.width = e.target.offsetWidth - 12 + "px"; //缩小
-                e.target.style.left = (this.resultX += 6) + "px";
-                e.target.style.top = (this.resultY += 6) + "px";
+                // e.target.style.width = e.target.offsetWidth - w + "px"; //缩小
+                // e.target.style.left = (this.resultX += left) + "px";
+                // e.target.style.top = (this.resultY += top) + "px"
             } else {
-                // e.target.style.transform = `scale(${this.elScale += 0.04})`; //放大
-                e.target.style.width = e.target.offsetWidth + 12 + "px"; //缩小
-                e.target.style.left = (this.resultX -= 6) + "px"
-                e.target.style.top = (this.resultY -= 6) + "px"
+                w = w + 20;
+                this.elScale += 0.04
+                // e.target.style.transform = `scale(${this.elScale})`; //放大
+                // e.target.style.left = (this.resultX -= left) + "px"
+                // e.target.style.width = e.target.offsetWidth + w + "px"; //缩小
+                // e.target.style.left = (this.resultX -= left) + "px"
+                // e.target.style.top = (this.resultY -= top) + "px"
             }
+            // console.log(e.offsetX, e.offsetY)
+            // e.target.style.width = w + "px";
+            // console.log(e.target.offsetWidth)
+            e.target.style.left = -(e.clientX * this.elScale - e.clientX) + this.moverT + "px";
+            e.target.style.top = -(e.clientY * this.elScale - e.clientY) + this.moverT + "px";
+            // e.target.style.width = e.target.offsetWidth -  * this.elScale + "px";
+            // console.log(e.clientX * this.elScale - e.clientX, e.clientY * this.elScale - e.clientY)
             // }
         },
         // 上传的图层
@@ -167,20 +222,45 @@ export default {
             img.onmouseenter = this.mouseenter; //鼠标移入
             img.onmouseleave = this.mouseleave; //鼠标移开
             img.onmousewheel = this.mousewheel; //鼠标移开
+            let id = String(Math.random())
+            img.setAttribute("id", id);
+            // img.style.transition = "all 0.3s";
             this.planContainer.appendChild(img)
+            img.style.position = "absolute";
+            img.style.opacity = 0;
             // this.loading = false;
             setTimeout(() => {
-                console.log(img.offsetWidth, 111111)
-                this.drawing.push({
-                    name: "a", //所属名称
-                    type: "img",
-                    hierarchy: 1, //所属层级
-                    width: img.offsetWidth, //宽度
-                    height: img.offsetHeight, //高度
-                    left: 0, //左-坐标
-                    top: 0, //上-坐标
-                })
+                let obj = {
+                    id: id, //唯一标识
+                    scale: 1, //放大倍数
+                    // hierarchy: 1, //所属层级
+                    // width: img.offsetWidth, //宽度
+                    // height: img.offsetHeight, //高度
+                    left: (this.planContainer.offsetWidth - img.offsetWidth) / 2, //左-坐标
+                    top: (this.planContainer.offsetHeight - img.offsetHeight) / 2, //上-坐标
+                }
+                this.drawing.push(obj)
+                img.style.left = obj.left + "px";
+                img.style.top = obj.top + "px";
+                this.resultX = obj.left;
+                this.resultY = obj.top;
+                img.style.opacity = 1;
             }, 100);
+        },
+        //删除元素
+        deleEl() {
+            let index = this.getIndex();
+            this.drawing.splice(index, 1)
+            this.conEl.remove()
+            this.isShow = false;
+            this.resultX = 0; //元素最后的停留坐标
+            this.resultY = 0; //元素最后的停留坐标
+        },
+        getIndex() {
+            let index = this.drawing.findIndex((e) => {
+                return e.id === this.ELid
+            })
+            return index
         }
     },
     components: {},
@@ -194,13 +274,13 @@ export default {
     // height: 100%;
     overflow: auto;
     background: #333;
-    // position: relative;
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: relative;
+    // position: fixed;
+    // top: 0;
+    // left: 0;
     .plan-container {
-        width: 200%;
-        height: 200%;
+        width: 100%;
+        height: 100%;
         img {
             position: absolute;
         }
@@ -217,7 +297,19 @@ export default {
         left: 0;
     }
     .right-key {
+        background: #fff;
         position: absolute;
+        padding: 10px 0;
+        cursor: pointer;
+        box-shadow: 0 0 12px #333;
+        border-radius: 2px;
+        overflow: hidden;
+        li {
+            padding: 10px 20px;
+        }
+        li:hover {
+            background: #ccc;
+        }
     }
 }
 .plan::-webkit-scrollbar {
