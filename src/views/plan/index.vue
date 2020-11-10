@@ -49,7 +49,7 @@
                         <li @click="deleEl">删除</li>
                     </ul>
                     <div v-if="drawing[ELid]" class="list">
-                        <div>左{{ drawing[ELid].left }} 上{{ drawing[ELid].top }} 宽{{ drawing[ELid].width }} 高{{ drawing[ELid].width }} x{{ drawing[ELid].resultX }} y{{ drawing[ELid].resultY }} px{{ drawing[ELid].parentX }} py{{ drawing[ELid].parentY }}</div>
+                        <div>左{{ drawing[ELid].left }} 上{{ drawing[ELid].top }} 宽{{ drawing[ELid].width }} 高{{ drawing[ELid].height }} x{{ drawing[ELid].resultX }} y{{ drawing[ELid].resultY }} px{{ drawing[ELid].parentX }} py{{ drawing[ELid].parentY }}</div>
                         <div>锁定值{{ drawing[ELid].lock }}</div>
                     </div>
                     <!-- <img src="./a.jpg" alt="" srcset="" @mousedown="mousedown" @mouseup="mouseup" @mousewheel="mousewheel" @mouseenter.stop="mouseenter" @mouseleave="mouseleave"> -->
@@ -201,10 +201,10 @@ export default {
                 let img = document.getElementsByTagName("img");
                 this.drawing[this.ELid].parentX = left - img[0].offsetLeft;
                 this.drawing[this.ELid].parentY = top - img[0].offsetTop;
-                if (this.drawing[this.ELid].parentX == 0) {
+                if (this.drawing[this.ELid].type === "parent") {
                     for (let i = 0; i < img.length; i++) {
-                        if (i !== 0) {
-                            let id = img[i].getAttribute("id");
+                        let id = img[i].getAttribute("id");
+                        if (this.drawing[id].type === "children") {
                             img[i].style.left = left + this.drawing[id].parentX + "px";
                             img[i].style.top = top + this.drawing[id].parentY + "px";
                             this.drawing[id].left = img[i].offsetLeft;
@@ -242,10 +242,12 @@ export default {
             e.target.style.width = e.target.offsetWidth + e.target.offsetWidth * this.elScale + "px";
             let img = document.getElementsByTagName("img");
             for (let i = 0; i < img.length; i++) {
-                if (i !== 0) {
-                    let id = img[i].getAttribute("id");
-                    img[i].style.left = (e.target.offsetLeft*this.elScale) + this.drawing[id].parentX + "px";
-                    img[i].style.top = (e.target.offsetTop*this.elScale) + this.drawing[id].parentY + "px";
+                let id = img[i].getAttribute("id");
+                if (this.drawing[id].type === "children") {
+                    img[i].style.left = (this.drawing[id].parentX + this.drawing[id].width / 2) * this.elScale + this.drawing[id].parentX + e.target.offsetLeft + "px";
+                    img[i].style.top = (this.drawing[id].parentY + this.drawing[id].height * 0.75) * this.elScale + this.drawing[id].parentY + e.target.offsetTop + "px";
+                    this.drawing[id].parentX += (this.drawing[id].parentX + this.drawing[id].width / 2) * this.elScale;
+                    this.drawing[id].parentY += (this.drawing[id].parentY + this.drawing[id].height * 0.75) * this.elScale;
                     this.drawing[id].left = img[i].offsetLeft;
                     this.drawing[id].top = img[i].offsetTop;
                     this.drawing[id].resultX = img[i].offsetLeft;
@@ -272,9 +274,11 @@ export default {
             img.style.opacity = 0;
             img.style.zIndex = 1;
             this.planContainer.appendChild(img);
+            let EL = document.getElementsByTagName("img")
             setTimeout(() => {
                 this.$set(this.drawing, id, {
                     id: id, //唯一标识
+                    type: "children", // 表示父级
                     left: 0, //左-坐标
                     top: 0, //上-坐标
                     lock: {}, //锁定值
@@ -287,6 +291,7 @@ export default {
                 });
                 this.ELid = id; //当前元素id
                 this.conEl = img; //当前元素
+                
                 img.style.left = this.drawing[id].left + "px";
                 img.style.top = this.drawing[id].top + "px";
                 img.style.opacity = 1;
@@ -310,6 +315,7 @@ export default {
             setTimeout(() => {
                 this.$set(this.drawing, id, {
                     id: id, //唯一标识
+                    type: "parent", // 表示父级
                     left: 0, //左-坐标
                     top: 0, //上-坐标
                     lock: {}, //锁定值
@@ -328,12 +334,11 @@ export default {
         //删除元素
         deleEl() {
             this.conEl.remove();
+            console.log(this.drawing[this.ELid])
             // delete this.drawing[this.ELid];
             // let index = this.getIndex();
             // this.drawing.splice(index, 1)
-            // this.isShow = false;
-            // this.resultX = 0; //元素最后的停留坐标
-            // this.resultY = 0; //元素最后的停留坐标
+            this.isShow = false;
         },
         lockImgVal() {
             this.drawing[this.ELid].lock = {
