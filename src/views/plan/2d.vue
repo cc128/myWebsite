@@ -6,11 +6,11 @@
 <template>
     <div class="floor-plan">
         <div class="plan-container" @mousemove="mousemove">
-            <div v-if="parentImg.length" class="lock">
-                <i v-if="Object.keys(parentImg[0].lock).length" class="el-icon-lock" @click="parentImg[0].lock = {}"></i>
+            <div v-if="floorPlanData.length" class="lock">
+                <i v-if="Object.keys(floorPlanData[0].lock).length" class="el-icon-lock" @click="floorPlanData[0].lock = {}"></i>
                 <i v-else class="el-icon-unlock" @click="lockImgVal"></i>
             </div>
-            <div class="full-screen">
+            <div v-if="floorPlanData.length && isIconBtn" class="full-screen">
                 <span @click="zoom(0.04)">
                     <svg t="1605081419908" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2860" width="30" height="30">
                         <path d="M980.700543 468.454893H557.401933V45.156283a43.350032 43.350032 0 0 0-86.700063 0v423.29861H47.396035a43.350032 43.350032 0 0 0 0 86.700064h423.305835v423.31306a43.350032 43.350032 0 0 0 86.700063 0v-423.31306h423.29861a43.350032 43.350032 0 0 0 0-86.700064z" fill="#409eff" p-id="2861"></path>
@@ -34,18 +34,21 @@
                     </svg>
                 </span>
             </div>
-            <ul v-show="isShow" class="right-key">
-                <li @click="deleEl">删除</li>
-            </ul>
-            <img class="plan-img" v-for="(item, i) in parentImg" :key="item.id" :src="item.url" :style="{width: `${item.width}px`, height: `${item.height}px`, left: `${item.left}px`, top: `${item.top}px`, zIndex: item.zIndex}" :id="item.id" :type="item.type" :index="i" @mousedown="mousedown" @mouseup="mouseup" @mousewheel="mousewheel" @mouseenter.stop="mouseenter" @mouseleave="mouseleave">
+            <div v-show="floorPlanData.length && id" class="right-key" @click="deleEl">
+                <div>
+                    <svg t="1605451157155" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3410" width="30" height="30">
+                        <path d="M841.142857 128h-658.285714c-60.635429 0-109.714286 42.934857-109.714286 96.036571V256h877.714286v-31.963429c0-53.101714-49.078857-96.036571-109.714286-96.036571zM649.508571 64l16.091429 100.937143H358.4l16.091429-100.937143h275.017142zM658.285714 0H365.714286c-30.208 0-58.221714 21.357714-62.464 47.542857l-21.357715 133.924572c-4.242286 26.185143 17.042286 47.542857 47.250286 47.542857h365.714286c30.208 0 51.492571-21.357714 47.250286-47.542857L720.749714 47.542857C716.507429 21.357714 688.493714 0 658.285714 0z m201.142857 320h-694.857142c-40.228571 0-70.217143 28.672-66.56 63.780571l59.977142 576.438858c3.584 35.108571 39.497143 63.780571 79.725715 63.780571h548.571428c40.228571 0 76.141714-28.672 79.725715-63.780571l59.977142-576.438858c3.657143-35.108571-26.331429-63.780571-66.56-63.780571zM365.714286 896H256L219.428571 448h146.285715v448z m219.428571 0H438.857143V448h146.285714v448z m182.857143 0H658.285714V448h146.285715l-36.571429 448z" p-id="3411" fill="#409eff"></path>
+                    </svg>
+                </div>
+                <!-- <div>删除</div> -->
+            </div>
+            <img class="plan-img" v-for="(item, i) in floorPlanData" :key="item.id" :src="item.url" :style="{width: `${item.width}px`, height: `${item.height}px`, left: `${item.left}px`, top: `${item.top}px`, zIndex: item.zIndex}" :id="item.id" :type="item.type" :index="i" @mousedown="mousedown" @mouseup="mouseup" @mousewheel="mousewheel" @mouseenter.stop="mouseenter" @mouseleave="mouseleave">
             <!--   -->
-            <img class="children-img" v-for="(item, i) in parentImg[0] ? parentImg[0].children : []" :key="item.id" :src="item.url" alt="" :style="{width: `${item.width}px`, height: `${item.height}px`, left: `${item.left}px`, top: `${item.top}px`, zIndex: `${item.zIndex}`}" :id="item.id" :type="item.type" :index="i" @mousedown="mousedown" @mouseup="mouseup" @mouseenter.stop="mouseenter" @mouseleave="mouseleave">
+            <img class="children-img" v-for="(item, i) in floorPlanData[0] ? floorPlanData[0].children : []" :key="item.id" :src="item.url" alt="" :style="{width: `${item.width}px`, height: `${item.height}px`, left: `${item.left}px`, top: `${item.top}px`, zIndex: `${item.zIndex}`}" :id="item.id" :type="item.type" :index="i" :class="{highlighticon: item.id === id}" @mousedown="mousedown" @mouseup="mouseup" @mouseenter.stop="mouseenter" @mouseleave="mouseleave">
         </div>
-        <div v-if="parentImg.length" class="list">
-            {{ parentImg }}
-            <!-- <div>左{{ lock_info[ELid].left }} 上{{ lock_info[ELid].top }} 宽{{ lock_info[ELid].width }} 高{{ lock_info[ELid].height }} x{{ lock_info[ELid].resultX }} y{{ lock_info[ELid].resultY }} px{{ lock_info[ELid].parentX }} py{{ lock_info[ELid].parentY }}</div>
-            <div>锁定值{{ lock_info[ELid].lock }}zIndex{{ zIndex }}</div> -->
-        </div>
+        <!-- <div v-if="floorPlanData.length" class="list">
+            {{ floorPlanData }}
+        </div> -->
     </div>
 </template>
 
@@ -73,11 +76,10 @@ export default {
     },
     data() {
         return {
-            parentImg: [], //图片容器
-            lock_info: {}, //图纸-存储所有操作信息
-            childrenIcon: [], //图标
-            url: "", //图纸
-            parentID: null, //图层id
+            isIconBtn: false,
+            id: "",
+            active: null, //右键选中的值
+            floorPlanData: [], //图片容器-存储所有操作信息
             fullscreen: false, //是否全屏
             ELid: "", //当前元素的唯一标识
             rightKeyEl: null, //右键菜单元素
@@ -86,7 +88,6 @@ export default {
             planContainer: "", //图层容器
             div: null, //根节点
             isRightKey: false, // 右键是否按下
-            conEl: null, // 存储元素
             rightKeyX: 0, //鼠标右键按下的x点
             rightKeyY: 0, //鼠标右键按下的y点
             ctrlKey: false, //组合键使用，暂未使用
@@ -123,7 +124,6 @@ export default {
         this.planContainer = document.getElementsByClassName("plan-container")[0]; //容器
         this.rightKeyEl = document.getElementsByClassName("right-key")[0];//右键菜单元素
         this.isDate();
-        this.childrenImg = document.getElementsByClassName("children-img"); // icon图标
 
     },
     watch: {
@@ -137,7 +137,7 @@ export default {
         },//添加图标
         formInline: {
             handler(v1, v2) {
-                // this.lock_info = JSON.parse(this.formInline.lock_info);
+                this.floorPlanData = JSON.parse(this.formInline.lock_info);
             },
             // immediate: true,  //刷新加载 立马触发一次handler
             deep: true  // 可以深度检测到 person 对象的属性值的变化
@@ -146,7 +146,7 @@ export default {
     methods: {
         // 是否加载图片
         isDate() {
-            if (this.parentImg.length) {
+            if (this.floorPlanData.length) {
                 this.planImg = document.getElementsByClassName("plan-img")[0]; // 平面图
             } else {
                 setTimeout(() => {
@@ -161,7 +161,7 @@ export default {
         },
         // 暴露获取值的方法
         confirm() {
-            return this.lock_info
+            return this.floorPlanData
         },
         // 鼠标按下
         mousedown(e) {
@@ -179,23 +179,27 @@ export default {
         },
         // 鼠标松开
         mouseup(e) {
-            console.log(e)
             e.target.style.cursor = "pointer";
+            let i = e.path[0].getAttribute("index");
             if (e.button === 0) {
                 this.isRightKey = false;
                 let obj;
                 if (e.path[0].getAttribute("type") === "parent") {
-                    obj = this.parentImg[0];
+                    obj = this.floorPlanData[0];
                 } else {
-                    let i = e.path[0].getAttribute("index");
-                    obj = this.parentImg[0].children[i];
+                    obj = this.floorPlanData[0].children[i];
+                    this.id = obj.id;
                 }
                 obj.resultX = e.target.offsetLeft;
                 obj.resultY = e.target.offsetTop;
+
             } else if (e.button === 2) {
-                this.isShow = true;
-                this.rightKeyEl.style.left = e.target.offsetLeft + e.offsetX + 30 + "px";
-                this.rightKeyEl.style.top = e.target.offsetTop + e.offsetY - 20 + "px";
+                if (e.path[0].getAttribute("type") === "children") {
+                    // this.active = i;
+                    // this.isShow = true;
+                    // this.rightKeyEl.style.left = e.target.offsetLeft + e.offsetX + 30 + "px";
+                    // this.rightKeyEl.style.top = e.target.offsetTop + e.offsetY - 20 + "px";
+                }
             }
         },
         // 鼠标移动
@@ -203,10 +207,10 @@ export default {
             if (this.isRightKey && e.button === 0) {
                 let obj;
                 if (e.path[0].getAttribute("type") === "parent") {
-                    obj = this.parentImg[0];
+                    obj = this.floorPlanData[0];
                 } else {
                     let i = e.path[0].getAttribute("index");
-                    obj = this.parentImg[0].children[i];
+                    obj = this.floorPlanData[0].children[i];
                 }
                 // 左移动距离 === 鼠标移动位置 - 鼠标按下时的位置 + 拖动前-鼠标松开的值
                 let left = e.clientX - this.rightKeyX + obj.resultX; // 计算移动距离
@@ -223,16 +227,16 @@ export default {
                 // // 更新数据
                 obj.left = left;
                 obj.top = top;
-                obj.parentX = left - this.parentImg[0].left;
-                obj.parentY = top - this.parentImg[0].top;
+                obj.parentX = left - this.floorPlanData[0].left;
+                obj.parentY = top - this.floorPlanData[0].top;
                 if (obj.type === "parent") {
                     // let img = document.getElementsByTagName("img");
-                    for (let i = 0; i < this.parentImg[0].children.length; i++) {
-                        // if ((this.parentImg[0].children[i].parentX <= e.target.width - this.parentImg[0].children[i].width / 2) && (this.parentImg[0].children[i].parentY <= e.target.height - this.parentImg[0].children[i].height * 0.75) && (this.parentImg[0].children[i].parentX >= -(this.parentImg[0].children[i].width / 2)) && (this.parentImg[0].children[i].parentY >= -(this.parentImg[0].children[i].height * 0.75))) {
-                        this.parentImg[0].children[i].left = left + this.parentImg[0].children[i].parentX;
-                        this.parentImg[0].children[i].top = top + this.parentImg[0].children[i].parentY;
-                        this.parentImg[0].children[i].resultX = left + this.parentImg[0].children[i].parentX;
-                        this.parentImg[0].children[i].resultY = top + this.parentImg[0].children[i].parentY;
+                    for (let i = 0; i < this.floorPlanData[0].children.length; i++) {
+                        // if ((this.floorPlanData[0].children[i].parentX <= e.target.width - this.floorPlanData[0].children[i].width / 2) && (this.floorPlanData[0].children[i].parentY <= e.target.height - this.floorPlanData[0].children[i].height * 0.75) && (this.floorPlanData[0].children[i].parentX >= -(this.floorPlanData[0].children[i].width / 2)) && (this.floorPlanData[0].children[i].parentY >= -(this.floorPlanData[0].children[i].height * 0.75))) {
+                        this.floorPlanData[0].children[i].left = left + this.floorPlanData[0].children[i].parentX;
+                        this.floorPlanData[0].children[i].top = top + this.floorPlanData[0].children[i].parentY;
+                        this.floorPlanData[0].children[i].resultX = left + this.floorPlanData[0].children[i].parentX;
+                        this.floorPlanData[0].children[i].resultY = top + this.floorPlanData[0].children[i].parentY;
                         // } // 设备移除图层外，不做联动
                     }
                 }
@@ -241,76 +245,84 @@ export default {
         // 鼠标移入
         mouseenter(e) {
             // // if (this.isShow) return;
-            e.target.style.boxShadow = "0 0 10px #fff";
+            // e.target.style.boxShadow = "0 0 10px #fff";
             e.target.style.cursor = "pointer";
             // 鼠标移入图标时提高层级
             let obj;
             if (e.path[0].getAttribute("type") === "parent") {
-                obj = this.parentImg[0];
+                obj = this.floorPlanData[0];
             } else {
                 let i = e.path[0].getAttribute("index");
-                obj = this.parentImg[0].children[i];
-                obj = this.zIndex += 1;
+                obj = this.floorPlanData[0].children[i];
+                obj.zIndex = this.zIndex += 1;
             }
         },
         // 鼠标移开
         mouseleave(e) {
-            e.target.style.boxShadow = "0 0 0px #fff";
+            // e.target.style.boxShadow = "0 0 0px #fff";
             this.isRightKey = false;
             let obj;
             if (e.path[0].getAttribute("type") === "parent") {
-                obj = this.parentImg[0];
+                obj = this.floorPlanData[0];
             } else {
                 let i = e.path[0].getAttribute("index");
-                obj = this.parentImg[0].children[i];
+                obj = this.floorPlanData[0].children[i];
             }
             obj.resultX = e.target.offsetLeft;
             obj.resultY = e.target.offsetTop;
-            // this.lock_info[this.ELid].resultX = this.conEl.offsetLeft;
-            // this.lock_info[this.ELid].resultY = this.conEl.offsetTop;
         },
         // 缩放
         zoom(elScale) {
-            // let w = this.planImg.offsetWidth * elScale + this.planImg.offsetWidth;
-            // let l = this.planImg.offsetLeft - this.planImg.offsetWidth / 2 * elScale;
-            // let t = this.planImg.offsetTop - this.planImg.offsetHeight / 2 * elScale;
-            // this.planImg.style.left = l + "px";
-            // this.planImg.style.top = t + "px";
-            // this.planImg.style.width = w + "px";
-
-            // let img = document.getElementsByTagName("img");
-            // for (let i = 0; i < img.length; i++) {
-            //     let id = img[i].getAttribute("id");
-            //     if (this.lock_info[id].type === "children") {
-            //         // if ((this.lock_info[id].parentX <= this.planImg.width - this.lock_info[id].width / 2) && (this.lock_info[id].parentY <= this.planImg.height - this.lock_info[id].height * 0.75) && (this.lock_info[id].parentX >= -(this.lock_info[id].width / 2)) && (this.lock_info[id].parentY >= -(this.lock_info[id].height * 0.75))) {
-            //         // 左移动距离 === 设备距离父级的值 + 设备宽的一半 * 缩放倍数 + 设备距离父级的值 + 父级的左值
-            //         img[i].style.left = (this.lock_info[id].parentX + this.lock_info[id].width / 2) * elScale + this.lock_info[id].parentX + this.planImg.offsetLeft + "px";
-            //         img[i].style.top = (this.lock_info[id].parentY + this.lock_info[id].height * 0.75) * elScale + this.lock_info[id].parentY + this.planImg.offsetTop + "px";
-            //         this.lock_info[id].parentX += (this.lock_info[id].parentX + this.lock_info[id].width / 2) * elScale;
-            //         this.lock_info[id].parentY += (this.lock_info[id].parentY + this.lock_info[id].height * 0.75) * elScale;
-            //         this.lock_info[id].left = img[i].offsetLeft;
-            //         this.lock_info[id].top = img[i].offsetTop;
-            //         this.lock_info[id].resultX = img[i].offsetLeft;
-            //         this.lock_info[id].resultY = img[i].offsetTop;
-            //         // } // 设备移除图层外，不做联动
-            //     }
-            // }
-            // this.lock_info[this.parentID].width = this.planImg.offsetWidth; //宽
-            // this.lock_info[this.parentID].height = this.planImg.offsetHeight; //宽
-            // this.lock_info[this.parentID].left = this.planImg.offsetLeft; //元素x位置
-            // this.lock_info[this.parentID].top = this.planImg.offsetTop; //元素x位置
-            // this.lock_info[this.parentID].resultX = this.planImg.offsetLeft; //最后的位置
-            // this.lock_info[this.parentID].resultY = this.planImg.offsetTop; //最后的位置
+            if (elScale < 0) {
+                if (this.floorPlanData[0].width <= this.planContainer.offsetWidth / 2) {
+                    // 最小缩放为容器宽度的一半
+                    return
+                }
+                if (Object.keys(this.floorPlanData[0].lock).length) {
+                    if (this.floorPlanData[0].width <= this.floorPlanData[0].lock.width) {
+                        // 锁定时禁止缩小
+                        return
+                    }
+                }
+            } else {
+                if (this.floorPlanData[0].width >= 10000 || this.floorPlanData[0].height >= 10000) {
+                    // 最大放大等级
+                    return
+                }
+            }
+            let w = this.floorPlanData[0].width * elScale + this.floorPlanData[0].width;
+            let h = this.floorPlanData[0].height * elScale + this.floorPlanData[0].height;
+            let l = this.floorPlanData[0].left - this.floorPlanData[0].width / 2 * elScale;
+            let t = this.floorPlanData[0].top - this.floorPlanData[0].height / 2 * elScale;
+            this.floorPlanData[0].width = w;
+            this.floorPlanData[0].height = h;
+            this.floorPlanData[0].top = t;
+            this.floorPlanData[0].left = l;
+            this.floorPlanData[0].resultX = l;
+            this.floorPlanData[0].resultY = t;
+            for (let i = 0; i < this.floorPlanData[0].children.length; i++) {
+                // // 左移动距离 === 设备距离父级的值 + 设备宽的一半 * 缩放倍数 + 设备距离父级的值 + 父级的左值
+                let parentX = (this.floorPlanData[0].children[i].parentX + this.floorPlanData[0].children[i].width / 2) * elScale;
+                let parentY = (this.floorPlanData[0].children[i].parentY + this.floorPlanData[0].children[i].height * 0.75) * elScale;
+                this.floorPlanData[0].children[i].left = l + parentX + this.floorPlanData[0].children[i].parentX;
+                this.floorPlanData[0].children[i].top = t + parentY + this.floorPlanData[0].children[i].parentY;
+                this.floorPlanData[0].children[i].parentX += parentX;
+                this.floorPlanData[0].children[i].parentY += parentY;
+                this.floorPlanData[0].children[i].resultX = this.floorPlanData[0].children[i].left;
+                this.floorPlanData[0].children[i].resultY = this.floorPlanData[0].children[i].top;
+                // // if ((this.floorPlanData[0].children[i].parentX <= e.target.width - this.floorPlanData[0].children[i].width / 2) && (this.floorPlanData[0].children[i].parentY <= e.target.height - this.floorPlanData[0].children[i].height * 0.75) && (this.floorPlanData[0].children[i].parentX >= -(this.floorPlanData[0].children[i].width / 2)) && (this.floorPlanData[0].children[i].parentY >= -(this.floorPlanData[0].children[i].height * 0.75))) {
+                // } // 设备移除图层外，不做联动
+            }
         },
         // 滚轮事件
         mousewheel(e) {
             if (e.deltaY > 0) {
-                // if (e.target.offsetWidth <= this.planContainer.offsetWidth / 2) {
-                //     // 最小缩放为容器宽度的一半
-                //     return
-                // }
-                if (Object.keys(this.parentImg[0].lock).length) {
-                    if (e.target.offsetWidth <= this.parentImg[0].lock.w) {
+                if (e.target.offsetWidth <= this.planContainer.offsetWidth / 2) {
+                    // 最小缩放为容器宽度的一半
+                    return
+                }
+                if (Object.keys(this.floorPlanData[0].lock).length) {
+                    if (e.target.offsetWidth <= this.floorPlanData[0].lock.width) {
                         // 锁定时禁止缩小
                         return
                     } else {
@@ -320,18 +332,18 @@ export default {
                     this.elScale = -0.04
                 }
             } else {
-                // if (e.target.offsetWidth >= 10000 || e.target.offsetHeight >= 10000) {
-                //     // 最大放大等级
-                //     return
-                // }
+                if (e.target.offsetWidth >= 10000 || e.target.offsetHeight >= 10000) {
+                    // 最大放大等级
+                    return
+                }
                 this.elScale = 0.04
             }
             let obj;
             if (e.path[0].getAttribute("type") === "parent") {
-                obj = this.parentImg[0];
+                obj = this.floorPlanData[0];
             } else {
                 let i = e.path[0].getAttribute("index");
-                obj = this.parentImg[0].children[i];
+                obj = this.floorPlanData[0].children[i];
             }
             obj.left = e.target.offsetLeft - e.offsetX * this.elScale;
             obj.top = e.target.offsetTop - e.offsetY * this.elScale;
@@ -339,173 +351,99 @@ export default {
             obj.height = e.target.offsetHeight + e.target.offsetHeight * this.elScale; //宽
             obj.resultX = obj.left; //最后的位置
             obj.resultY = obj.top; //最后的位置
-            for (let i = 0; i < this.parentImg[0].children.length; i++) {
-                // // if ((this.lock_info[id].parentX <= e.target.width - this.lock_info[id].width / 2) && (this.lock_info[id].parentY <= e.target.height - this.lock_info[id].height * 0.75) && (this.lock_info[id].parentX >= -(this.lock_info[id].width / 2)) && (this.lock_info[id].parentY >= -(this.lock_info[id].height * 0.75))) {
+            for (let i = 0; i < this.floorPlanData[0].children.length; i++) {
                 // // 左移动距离 === 设备距离父级的值 + 设备宽的一半 * 缩放倍数 + 设备距离父级的值 + 父级的左值
-                let parentX = (this.parentImg[0].children[i].parentX + this.parentImg[0].children[i].width / 2) * this.elScale;
-                let parentY = (this.parentImg[0].children[i].parentY + this.parentImg[0].children[i].height * 0.75) * this.elScale;
-                this.parentImg[0].children[i].parentX += parentX;
-                this.parentImg[0].children[i].parentY += parentY;
-                this.parentImg[0].children[i].left = parentX + this.parentImg[0].children[i].parentX + e.target.offsetLeft;
-                this.parentImg[0].children[i].top = parentY + this.parentImg[0].children[i].parentY + e.target.offsetTop;
-                this.parentImg[0].children[i].resultX = parentX + this.parentImg[0].children[i].parentX + e.target.offsetLeft;
-                this.parentImg[0].children[i].resultY = parentY + this.parentImg[0].children[i].parentY + e.target.offsetTop;
+                let parentX = (this.floorPlanData[0].children[i].parentX + this.floorPlanData[0].children[i].width / 2) * this.elScale;
+                let parentY = (this.floorPlanData[0].children[i].parentY + this.floorPlanData[0].children[i].height * 0.75) * this.elScale;
+                this.floorPlanData[0].children[i].left = obj.left + parentX + this.floorPlanData[0].children[i].parentX;
+                this.floorPlanData[0].children[i].top = obj.top + parentY + this.floorPlanData[0].children[i].parentY;
+                this.floorPlanData[0].children[i].parentX += parentX;
+                this.floorPlanData[0].children[i].parentY += parentY;
+                this.floorPlanData[0].children[i].resultX = this.floorPlanData[0].children[i].left;
+                this.floorPlanData[0].children[i].resultY = this.floorPlanData[0].children[i].top;
+                // // if ((this.floorPlanData[0].children[i].parentX <= e.target.width - this.floorPlanData[0].children[i].width / 2) && (this.floorPlanData[0].children[i].parentY <= e.target.height - this.floorPlanData[0].children[i].height * 0.75) && (this.floorPlanData[0].children[i].parentX >= -(this.floorPlanData[0].children[i].width / 2)) && (this.floorPlanData[0].children[i].parentY >= -(this.floorPlanData[0].children[i].height * 0.75))) {
                 // } // 设备移除图层外，不做联动
-                // this.parentImg[0].children[i].left = this.parentImg[0].children[i].left - (this.parentImg[0].children[i].left + this.parentImg[0].children[i].width / 2) * this.elScale;
-                // this.parentImg[0].children[i].top = this.parentImg[0].children[i].top - (this.parentImg[0].children[i].top + this.parentImg[0].children[i].height * 0.75) * this.elScale;
             }
         },
         //添加图标
         addIcon(url) {
-            let id = String(Math.random());
-            this.parentImg[0].children.push({
-                id: id, //唯一标识
-                url: this.upIcon, //图标地址
-                type: "children", // 表示父级
-                left: this.parentImg[0].left, //左-坐标 初始化在图片左上角
-                top: this.parentImg[0].top, //上-坐标 初始化在图片左上角
-                lock: {}, //锁定值
-                width: 75, // 宽
-                height: 80, // 高
-                resultX: 0, // 最后的位置
-                resultY: 0, // 最后的位置
-                zIndex: this.zIndex,
-                parentX: 0, // 父x 初始化距离图层的位置
-                parentY: 0, // 父y初始化距离图层的位置
+            let arr = this.floorPlanData[0].children.filter(e => {
+                return e.url === url;
             })
-
-            // let img = document.createElement("img");
-            // img.src = url;
-            // img.onmousedown = this.mousedown; //鼠标按下
-            // img.onmouseup = this.mouseup; //鼠标松开
-            // img.onmouseenter = this.mouseenter; //鼠标移入
-            // img.onmouseleave = this.mouseleave; //鼠标移开
-            // img.setAttribute("id", id);
-            // img.style.opacity = 0;
-            // img.style.zIndex = this.zIndex += 1;
-            // let parentImg = document.getElementsByTagName("img")[0];
-            // this.planContainer.appendChild(img);
-            // setTimeout(() => {
-            //     this.$set(this.lock_info, id, {
-            //         id: id, //唯一标识
-            //         url: this.upIcon, //图标地址
-            //         type: "children", // 表示父级
-            //         left: parentImg.offsetLeft, //左-坐标 初始化在图片左上角
-            //         top: parentImg.offsetTop, //上-坐标 初始化在图片左上角
-            //         lock: {}, //锁定值
-            //         width: img.offsetWidth, // 宽
-            //         height: img.offsetHeight, // 高
-            //         resultX: 0, // 最后的位置
-            //         resultY: 0, // 最后的位置
-            //         zIndex: this.zIndex,
-            //         // parentX: img.offsetLeft - parentImg.offsetLeft, // 父x 初始化距离图层的位置
-            //         // parentY: img.offsetTop - parentImg.offsetTop, // 父y 初始化距离图层的位置
-            //         // parentX: img.offsetWidth / 2, // 父x
-            //         // parentY: img.offsetHeight * 0.75, // 父y
-            //         parentX: 0, // 父x 初始化距离图层的位置
-            //         parentY: 0, // 父y初始化距离图层的位置
-            //     });
-            //     this.ELid = id; //当前元素id
-            //     this.conEl = img; //当前元素
-            //     img.style.left = this.lock_info[id].left + "px";
-            //     img.style.top = this.lock_info[id].top + "px";
-            //     img.style.opacity = 1;
-            // }, 100);
+            if (arr.length) {
+                this.id = arr[0].id
+                // console.log(arr[0].id);
+            } else {
+                let id = String(Math.random());
+                this.floorPlanData[0].children.push({
+                    id: id, //唯一标识
+                    url: this.upIcon, //图标地址
+                    type: "children", // 表示父级
+                    left: this.floorPlanData[0].left, //左-坐标 初始化在图片左上角
+                    top: this.floorPlanData[0].top, //上-坐标 初始化在图片左上角
+                    lock: {}, //锁定值
+                    width: 75, // 宽
+                    height: 80, // 高
+                    resultX: 0, // 最后的位置
+                    resultY: 0, // 最后的位置
+                    zIndex: this.zIndex,
+                    parentX: 0, // 父x 初始化距离图层的位置
+                    parentY: 0, // 父y初始化距离图层的位置
+                });
+            }
         },
         //添加平面图
         upFunc(url) {
-            let id = String(Math.random());
-            this.parentID = id; // 图层id
-            this.$set(this.parentImg, 0, {
-                isShow: true,
-                url: this.upPlan, //图片地址
-                id: id, //唯一标识
-                type: "parent", // 表示父级
-                left: 0, //左-坐标
-                top: 0, //上-坐标
-                lock: {}, //锁定值
-                width: this.planContainer.offsetWidth, // 容器的宽
-                height: this.planContainer.offsetHeight, // 容器的高
-                resultX: 0, // 最后的位置
-                resultY: 0, // 最后的位置
-                zIndex: 0,
-                children: [],
-            });
-            // this.url = url;
-            // if (Object.keys(this.lock_info).length) {
-            //     let img = document.getElementsByTagName("img");
-            //     let imgLength = img.length;
-            //     for (let i = 0; i < imgLength - 1; i++) {
-            //         img[img.length - 1].remove();
-            //     }
-            //     this.lock_info = {};
-            // };
-            // if (url) {
-            //     // this.planImg.setAttribute("id", id);
-            //     setTimeout(() => {
-            //         this.ELid = id; //当前元素id
-            //         this.conEl = this.planImg; //当前元素
-            //         this.planImg.style.width = this.lock_info[id].width + "px";
-            //         this.planImg.style.left = this.lock_info[id].left + "px";
-            //         this.planImg.style.top = this.lock_info[id].top + "px";
-            //         this.planImg.style.opacity = 1;
-            //     }, 100)
-            // }
-
-
-            // let img = document.createElement("img");
-            // img.src = URL.createObjectURL(e.target.files[0]);
-            // img.onmousedown = this.mousedown; //鼠标按下
-            // img.onmouseup = this.mouseup; //鼠标松开
-            // img.onmouseenter = this.mouseenter; //鼠标移入
-            // img.onmouseleave = this.mouseleave; //鼠标移开
-            // img.onmousewheel = this.mousewheel; //鼠标滚轮
-            // this.planContainer.appendChild(img)
-            // img.style.position = "absolute";
-            // img.style.opacity = 0;
-            // img.style.zIndex = 0;
-            ;
+            if (url) {
+                let id = String(Math.random());
+                this.$set(this.floorPlanData, 0, {
+                    isShow: true,
+                    url: this.upPlan, //图片地址
+                    id: id, //唯一标识
+                    type: "parent", // 表示父级
+                    left: 0, //左-坐标
+                    top: 0, //上-坐标
+                    lock: {}, //锁定值
+                    width: this.planContainer.offsetWidth, // 容器的宽
+                    height: this.planContainer.offsetHeight, // 容器的高
+                    resultX: 0, // 最后的位置
+                    resultY: 0, // 最后的位置
+                    zIndex: 0,
+                    children: [],
+                });
+            } else {
+                this.floorPlanData = [];
+                this.id = null;
+            }
         },
         //删除元素
         deleEl() {
-            if (this.lock_info[this.ELid].type === "parent") {
-                this.$confirm('删除此图层和已添加的设备, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    closeOnClickModal: false,
-                    closeOnPressEscape: false,
-                    type: 'warning'
-                }).then(() => {
-                    this.conEl.remove();
-                    let img = document.getElementsByTagName("img");
-                    let imgLength = img.length;
-                    for (let i = 0; i < imgLength; i++) {
-                        img[img.length - 1].remove();
-                    }
-                    this.lock_info = {}
-                }).catch(() => { });
-            } else {
-                this.$confirm('删除此设备, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    closeOnClickModal: false,
-                    closeOnPressEscape: false,
-                    type: 'warning'
-                }).then(() => {
-                    this.conEl.remove();
-                    delete this.lock_info[this.ELid];
-                }).catch(() => { });
-
-            }
+            this.$confirm('删除此设备, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                closeOnClickModal: false,
+                closeOnPressEscape: false,
+                type: 'warning'
+            }).then(() => {
+                let i = this.floorPlanData[0].children.findIndex((e) => {
+                    return e.id === this.id
+                })
+                if (i >= 0) {
+                    this.floorPlanData[0].children.splice(i, 1);
+                    this.id = null;
+                }
+                // console.log(i, 111111)
+            }).catch(() => { });
             this.isShow = false;
+
         },
         // 锁定
         lockImgVal() {
-            this.lock_info[this.ELid].lock = {
-                w: this.conEl.offsetWidth,
-                h: this.conEl.offsetHeight,
-                l: this.conEl.offsetLeft,
-                t: this.conEl.offsetTop,
+            this.floorPlanData[0].lock = {
+                width: this.floorPlanData[0].width,
+                height: this.floorPlanData[0].height,
+                left: this.floorPlanData[0].left,
+                top: this.floorPlanData[0].top,
             }
         }
     },
@@ -514,6 +452,13 @@ export default {
 </script>
 
 <style lang="scss">
+:root {
+    --radial-gradient: radial-gradient(
+        yellow 15%,
+        rgba(0, 0, 0, 0),
+        rgba(0, 0, 0, 0)
+    );
+}
 .floor-plan {
     flex: 1;
     // width: 90%;
@@ -537,6 +482,20 @@ export default {
             // opacity: 0;
             z-index: 0;
         }
+        .children-img {
+            // border: 1px solid red;
+            border-radius: 50%;
+            &:hover {
+                background-image: radial-gradient(
+                    yellow 15%,
+                    rgba(0, 0, 0, 0),
+                    rgba(0, 0, 0, 0)
+                ) !important;
+            }
+        }
+        .highlighticon {
+            background-image: var(--radial-gradient);
+        }
         img {
             position: absolute;
         }
@@ -549,19 +508,18 @@ export default {
         z-index: 999;
     }
     .right-key {
-        background: #fff;
+        left: 50%;
         position: absolute;
-        padding: 10px 0;
+        bottom: 10px;
         cursor: pointer;
-        box-shadow: 0 0 12px #333;
-        border-radius: 2px;
         overflow: hidden;
         z-index: 999;
-        li {
-            padding: 10px 20px;
-        }
-        li:hover {
-            background: #ccc;
+        font-size: 14px;
+        // li {
+        //     padding: 10px 20px;
+        // }
+        &:hover {
+            transform: scale(1.1);
         }
     }
     .lock {

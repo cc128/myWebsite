@@ -41,7 +41,7 @@ export default {
             }
         };
     },
-    created() {},
+    created() { },
     methods: {
         upLoadFunc(e) {
             this.$emit("toStart") //加载loading
@@ -96,7 +96,7 @@ export default {
             if (!this.url) {
                 this.$emit("upSucceed", formData);
                 return
-            } 
+            }
             this.axios
                 .post(this.url, formData)
                 .then(res => {
