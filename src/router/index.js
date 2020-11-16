@@ -12,7 +12,7 @@ const routes = [
         children: [
             {
                 path: "/",
-                redirect: "/plan"
+                redirect: "/map"
             },
             {
                 path: "/animation",

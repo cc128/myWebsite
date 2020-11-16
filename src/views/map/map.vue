@@ -24,6 +24,10 @@ export default {
             fbxloader: new THREE.FBXLoader(), //FBX加载器
             initCameraXYZ: null, //初值相机位置
             planeGeometry: null, //平面
+            GLTFLoader: new THREE.GLTFLoader(),
+            mixer: null,
+            fbx: null, //模型
+            AnimationAction: null, //动画
         };
     },
     computed: {},
@@ -49,7 +53,7 @@ export default {
         render() {
             this.renderer.render(this.scene, this.camera);
             this.$emit("ready", this.scene, {
-                createModel: this.createModel,
+                createFBX: this.createFBX,
                 axesHelper: this.axesHelper, //辅助坐标系
                 gridHelper: this.gridHelper, //平面辅助线
                 cameraHelper: this.cameraHelper, //显示光照区域
@@ -82,6 +86,9 @@ export default {
             this.createLight(); //光源
             this.createCamera(); //相机
             this.createRender(); //渲染器
+            // this.createPlane();
+            this.axesHelper();
+            this.gridHelper();
         },
         //-------------------------------------------------------------------------------------------摄像机
         createCamera(params = { x: 1, y: 10, z: 10 }) {
@@ -114,7 +121,6 @@ export default {
         createRender() {
             this.renderer.setSize(this.width, this.height); //设置渲染区域尺寸
             this.renderer.setClearColor(0xffffff, 1); //设置背景颜色
-            // this.scene.background = new THREE.CubeTextureLoader().load(["https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png"]);; //作为背景贴图
             this.scene.background = new THREE.CubeTextureLoader()
                 // .setPath(require("../../../public/model/"))
                 .load([
@@ -147,7 +153,7 @@ export default {
             controls.dampingFactor = 0.1;
             controls.addEventListener("change", () => {
                 // if (this.isMover) return;
-                this.initCameraXYZ = JSON.parse(JSON.stringify(this.camera.position))
+                // this.initCameraXYZ = JSON.parse(JSON.stringify(this.camera.position))
                 // console.log(this.initCameraXYZ)
                 // console.log(this.camera)
                 this.renderer.render(this.scene, this.camera);
@@ -172,12 +178,15 @@ export default {
             // console.log(plane);
         }, //平面
         //-------------------------------------------------------------------------------------------导入模型
-        createModel(url, callBack) {
+        // 导入模型
+        createFBX(url, callBack) {
+            console.log(this.fbxloader, 222)
             return new Promise((resolve, reject) => {
+                console.log(this.fbxloader, 11111)
                 this.fbxloader.load(
-                    url,
+                    "./Walk.fbx",
                     fbx => {
-                        this.fbx = fbx;
+                        // this.fbx = fbx;
                         fbx.traverse(item => {
                             if (item instanceof THREE.Mesh) {
                                 item.castShadow = true;
@@ -196,6 +205,51 @@ export default {
                     }
                 );
             });
+        },
+        //加载模板动画
+        createAnimation(fbx) {
+            this.mixer = new THREE.AnimationMixer(fbx);
+            let AnimationAction = this.mixer.clipAction(fbx.animations[0]);
+            // AnimationAction.timeScale = 1; //默认1，可以调节播放速度
+            // AnimationAction.loop = THREE.LoopOnce; //不循环播放
+            // AnimationAction.clampWhenFinished=true;//暂停在最后一帧播放的状态
+            AnimationAction.play(); //播放动画
+            this.AnimationAction = AnimationAction;
+            this.runAnimation();
+            // 渲染函数
+            // const render = () => {
+            //     this.renderer.render(this.scene, this.camera); //执行渲染操作
+            //     window.requestAnimationFrame(render); //请求再次执行渲染函数render，渲染下一帧
+            //     if (mixer !== null) {
+            //         //clock.getDelta()方法获得两帧的时间间隔
+            //         // 更新混合器相关的时间
+            //         // console.log(clock.getDelta(), 1111);
+            //         mixer.update(0.015);
+            //     }
+            // };
+            // render();
+        },
+        //执行动画-每次多少帧
+        runAnimation(isContinue) {
+            // this.isMover = false;
+            // this.mixer.update(0.0167); //一帧时间
+            this.mixer.update(0.0334); //二帧时间
+            this.render();
+            // if (isContinue) {
+            //     window.cancelAnimationFrame(this.stop); //可以取消该次动画。
+            // } else {
+            //     const render = () => {
+            //         this.renderer.render(this.scene, this.camera); //执行渲染操作
+            //         this.stop = requestAnimationFrame(render); //请求再次执行渲染函数render，渲染下一帧
+            //         if (this.mixer !== null) {
+            //             //clock.getDelta()方法获得两帧的时间间隔
+            //             // 更新混合器相关的时间
+            //             // console.log(clock.getDelta(), 1111);
+            //             this.mixer.update(0.0167);
+            //         }
+            //     };
+            //     render();
+            // }
         },
         //-------------------------------------------------------------------------------------------辅助坐标系
         axesHelper(num = 10) {

@@ -4,7 +4,10 @@
 备注：xxxx
 */
 <template>
-    <s-map @ready="handleReady"></s-map>
+    <div>
+        <!-- <s-map @ready="handleReady"></s-map> -->
+
+    </div>
 </template>
 
 <script>
@@ -22,10 +25,10 @@ export default {
     watch: {},
     methods: {
         handleReady(scene, _this) {
-            console.log(_this, 11111)
-            // _this.createModel("./dym_new.glb").then(bolb => {
-            //     console.log(bolb, 11111)
-            // })
+            // console.log(_this, 11111)
+            _this.createFBX("", (bolb) => {
+                // console.log(bolb, 11111)
+            })
         }
     },
     components: {
