@@ -17,12 +17,12 @@ export default {
     },
     mounted() {
         this.$nextTick(() => {
-            this.x = (document.body.offsetWidth / 1920);
-            this.y = (document.body.offsetHeight / 1080);
-            window.addEventListener("resize", () => {
-                this.x = (document.body.offsetWidth / 1920);
-                this.y = (document.body.offsetHeight / 1080);
-            });
+            // this.x = (document.body.offsetWidth / 3840);
+            // this.y = (document.body.offsetHeight / 2160);
+            // window.addEventListener("resize", () => {
+            //     this.x = (document.body.offsetWidth / 3840);
+            //     this.y = (document.body.offsetHeight / 2160);
+            // });
         })
     },
     methods: {}
@@ -42,10 +42,12 @@ export default {
     background-color: rgba(0, 210, 255, 0.61);
 }
 #app {
+    width: 100%;
+    height: 100%;
     transform-origin: 0 0;
-    width: 1920px;
-    height: 1080px;
-    // overflow: hidden;
+    // width: 3840px;
+    // height: 2160px;
+    overflow: hidden;
     .el-menu.el-menu--horizontal {
         border: none;
     }

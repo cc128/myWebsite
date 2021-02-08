@@ -12,7 +12,37 @@ const routes = [
         children: [
             {
                 path: "/",
-                redirect: "/map"
+                redirect: "/vr"
+            },
+            {
+                path: "/bmap",
+                name: "全景",
+                component: () => import("../views/test/bmap.vue")
+            },
+            {
+                path: "/amap",
+                name: "高德",
+                component: () => import("../views/test/amap.vue")
+            },
+            // {
+            //     path: "/map",
+            //     name: "图表",
+            //     component: () => import("../views/test/map.vue")
+            // },
+            {
+                path: "/map2",
+                name: "离线地图",
+                component: () => import("../views/test/map2.vue")
+            },
+            {
+                path: "/map3",
+                name: "离线地图",
+                component: () => import("../views/test/map3.vue")
+            },
+            {
+                path: "/vr",
+                name: "VR",
+                component: () => import("../views/test/vr.vue")
             },
             {
                 path: "/animation",
@@ -58,6 +88,11 @@ const routes = [
                 path: "/plan",
                 name: "平面图",
                 component: () => import("../views/plan")
+            },
+            {
+                path: "/pMap",
+                name: "离线地图",
+                component: () => import("../views/test/pMap")
             }
         ]
     }

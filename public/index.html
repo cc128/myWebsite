@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico"> -->
     <title>个人站</title>
     <!-- <script src="http://www.yanhuangxueyuan.com/threejs/build/three.js"></script> -->
     <script src="js/three.js"></script>
@@ -34,12 +34,48 @@
     <!-- <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/examples/js/libs/inflate.min.js"></script> -->
     <script src="js/inflate.js"></script>
     <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <!-- 高德地图 -->
+    <script
+        src="//webapi.amap.com/maps?v=1.4.15&key=e8ca51f4102a09ca1d6b28b74631cea7&plugin=Map3D,AMap.DistrictSearch,AMap.RangingTool,AMap.MouseTool"></script>
+    <script src="//webapi.amap.com/loca?v=1.2.1&key=e8ca51f4102a09ca1d6b28b74631cea7"></script>
+    <!-- --距离/面积测量 -->
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" type="text/css">
+    <!-- --距离/面积测量 -->
+    <!-- --高德地图模型 -->
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+    <!-- --高德地图模型 -->
+    <!-- --高德地图 -->
 
-    <script src="./js/index.js"></script>
-    <!-- <script src="https://cdn.bootcss.com/eruda/1.4.3/eruda.min.js"></script>
+    <!-- 全景预览 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/gyroscope.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.min.js"></script>
+    <!-- 全景预览 -->
+
+    <!-- 离线地图 -->
+    <link rel="stylesheet" href="js/ol.css" type="text/css">
+    <script src="js/ol.js"></script>
+    <script src="js/pMap/pMap.js"></script>
+    <!-- <link rel="stylesheet" href="http://192.168.2.232:83/static/ol/ol.css" type="text/css">
+    <script src="http://192.168.2.232:83/static/ol/ol.js"></script>
+    <link rel="stylesheet" href="http://192.168.2.232:83/static/pMap/pMap.css" type="text/css">
+    <script src="http://192.168.2.232:83/static/pMap/pMap.js"></script> -->
+    <!-- 离线地图 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.js"></script>
+    <script src="https://unpkg.com/ol-echarts/dist/ol-echarts.js"></script>
+
+
+
+    <script src="js/krpano.js"></script>
+    <script src="https://cdn.bootcss.com/eruda/1.4.3/eruda.min.js"></script>
     <script>
         eruda.init();
-    </script> -->
+    </script>
 </head>
 <script>
     // //获取内网ip

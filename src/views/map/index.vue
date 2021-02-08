@@ -5,8 +5,7 @@
 */
 <template>
     <div>
-        <!-- <s-map @ready="handleReady"></s-map> -->
-
+        <s-map @ready="handleReady"></s-map>
     </div>
 </template>
 

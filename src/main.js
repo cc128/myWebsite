@@ -10,6 +10,9 @@ Vue.use(ElementUI);
 // 公共样式-组件
 import commonalityStype from "./components";
 Vue.use(commonalityStype);
+// 图表
+import echarts from "echarts";
+Vue.prototype.$echarts = echarts;
 
 import io from "socket.io-client";
 // Vue.prototype.$socket = io.connect("http://60.205.200.110:7005");
