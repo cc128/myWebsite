@@ -5,10 +5,28 @@ class webrtc {
         this.tracks = null;
         this.front = true;
     }
-    getCamera(tag) {
+    getCamera(tag, type) {
         this.videoBox = document.querySelector(tag);
-        return navigator.mediaDevices
-            .getUserMedia({
+        if (type) {
+            return navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: true,
+                cursor: "always"
+            }).then(localStream => {
+                // 获取摄像头画面，赋值给video标签
+                this.videoBox.srcObject = localStream;
+                // 播放
+                this.videoBox.onloadedmetadata = e => {
+                    this.videoBox.play();
+                };
+                this.tracks = localStream.getTracks()[0];
+                return {
+                    videoBox: this.videoBox,
+                    localStream: localStream
+                };
+            });
+        } else {
+            return navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
                     // width: { min: 1024, ideal: 1280, max: 1920 },
@@ -18,8 +36,7 @@ class webrtc {
 
                     facingMode: this.front ? "environment" : "user"
                 }
-            })
-            .then(localStream => {
+            }).then(localStream => {
                 this.tracks = localStream.getTracks()[0];
                 // 获取摄像头画面，赋值给video标签
                 this.videoBox.srcObject = localStream;
@@ -32,6 +49,7 @@ class webrtc {
                     localStream: localStream
                 };
             });
+        }
     }
     // 创建视频流
     getStream(localStream, callBack, time = 500) {

@@ -40,9 +40,9 @@
                 </svg>-->
             </div>
         </div>
-        <video v-show="this.callVideo" id="callVideo" autoplay></video>
+        <video v-show="this.callVideo" id="callVideo" playsinline autoplay></video>
         <!-- controls="controls" -->
-        <video v-show="this.calledVideo" id="calledVideo" autoplay="autoplay" muted="muted"></video>
+        <video v-show="this.calledVideo" id="calledVideo" playsinline autoplay muted="muted"></video>
     </div>
 </template>
 
@@ -114,19 +114,19 @@ export default {
                 this.isReception = false; //接通后，隐藏接听按钮
                 this.stateText = "视频已链接";
                 this.$nextTick(() => {
-                    this.calledVideo = document.querySelector("#calledVideo");
-                    // 创建可添加视频流的url
-                    this.mediaSource = new MediaSource();
-                    this.calledVideo.src = window.URL.createObjectURL(this.mediaSource);
-                    // 创建可添加视频流的url
-                    this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
-                    this.webRTC.getCamera("#callVideo").then(data => {
+                    this.webRTC.getCamera("#callVideo", "vcr").then(data => {
                         this.localStream = data.localStream; //自己的视频流
                         this.callVideo = data.videoBox // 自己的视频播放元素
                         this.sendVideo(res.sendVideoId)
                     }).catch(err => {
                         console.log("无可调用设备", err)
                     });
+                    this.calledVideo = document.querySelector("#calledVideo");
+                    // 创建可添加视频流的url
+                    this.mediaSource = new MediaSource();
+                    this.calledVideo.src = window.URL.createObjectURL(this.mediaSource);
+                    // 创建可添加视频流的url
+                    this.mediaSource.addEventListener("sourceopen", this.sourceOpen);
                 })
 
             } else if (res.isConsent === false) {
@@ -215,7 +215,7 @@ export default {
                     });
                 }
             };
-            this.mediaRecorder.start(300);
+            this.mediaRecorder.start(500);
         },
         // 设置视频流格式
         sourceOpen(e) {

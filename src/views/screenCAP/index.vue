@@ -8,7 +8,7 @@
     <div class="screenCAP-box">
         <div style="display: flex; align-items: center;">
             <div>
-                <video id="video" controls="controls" autoplay="true"></video>
+                <video id="video" controls="controls" playsinline autoplay></video>
             </div>
             <div>
                 <el-button :disabled="state === '开始录制' ? false : true" type="primary" @click="startVCR">开始录制</el-button>
@@ -17,11 +17,11 @@
             </div>
         </div>
         <div style="display: flex; align-items: center;">
-            <video id="upFileBox" width="300" height="150" controls="controls" style="background: #aaa;"></video>
+            <video id="upFileBox" width="300" height="150" playsinline autoplay controls="controls" style="background: #aaa;"></video>
             <div>
                 <input class="upInput" type="file" value="视频" accept=".webm,.mp4,.ogv,.AVI,.mov,.rmvb,.flv,.3GP" @change="getVideoFile" />
             </div>
-            <video id="upFileBox2" width="300" height="150" controls="controls" style="background: #aaa;"></video>
+            <video id="upFileBox2" width="300" height="150" playsinline autoplay controls="controls" style="background: #aaa;"></video>
         </div>
         <canvas id="canvas" width="900" height="450" style="width:300px; height:150px; background: #aaa;"></canvas>
     </div>

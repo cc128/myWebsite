@@ -12,7 +12,7 @@ const routes = [
         children: [
             {
                 path: "/",
-                redirect: "/vr"
+                redirect: "/video-call"
             },
             {
                 path: "/bmap",

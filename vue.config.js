@@ -1,5 +1,9 @@
 module.exports = {
     //css相关配置
+    devServer: {
+        disableHostCheck: true,
+        https: true
+    },
     css: {
         loaderOptions: {
             css: {

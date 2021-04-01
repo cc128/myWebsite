@@ -1,6 +1,6 @@
 <template>
     <div class="look-live">
-        <video v-for="(item, i) in liveList" :key="i" autoplay="autoplay" muted="muted" @click="getVideo($event, item)"></video>
+        <video v-for="(item, i) in liveList" :key="i" playsinline autoplay muted="muted" @click="getVideo($event, item)"></video>
     </div>
 </template>
 

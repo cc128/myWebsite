@@ -3,7 +3,7 @@
         <el-button v-if="isLive === false" class="btn" type="success" @click="startVideo">开始直播</el-button>
         <el-button v-else class="btn" type="danger" @click="overLive">结束直播</el-button>
 
-        <video v-show="isLive" id="anchor-video"></video>
+        <video v-show="isLive" playsinline autoplay id="anchor-video"></video>
         <div class="user-list">
             <div v-for="(item,i) in userData" :key="i">{{ item.name }}</div>
         </div>
@@ -49,7 +49,7 @@ export default {
         // 开始直播
         startVideo() {
             // 获取摄像头权限
-            this.webRTC.getCamera("#anchor-video").then(data => {
+            this.webRTC.getCamera("#anchor-video", "vcr").then(data => {
                 this.socketId = this.$store.state.socketId;
                 this.$socket.emit("linkLive", {
                     name: this.mYname,
@@ -61,13 +61,13 @@ export default {
                 this.anchorVideo = data.videoBox // 自己的视频播放元素
                 this.isLive = true;
                 this.webRTC.getStream(this.localStream, (blob) => {
-                    console.log(blob)
+                    console.log(blob, "直播推流")
                     this.$socket.emit("liveVideStream", {
                         socketId: this.socketId,
                         video: blob.data,
                         time: this.anchorVideo.currentTime
                     })
-                }, 5000)
+                }, 1000)
             }).catch(err => {
                 console.log("无可调用设备", err)
             });
@@ -141,6 +141,8 @@ export default {
         margin-top: -20px;
     }
     #anchor-video {
+        width: 200px;
+        height: 200px;
         // width: 100%;
         // height: 100%;
         // border: 1px solid #000;
