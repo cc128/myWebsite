@@ -21,7 +21,7 @@ Vue.prototype.$socket = io.connect("https://192.168.2.121:7004");
 // Vue.prototype.$socket = io.connect("https://192.168.0.188:7004");
 // Vue.prototype.$socket = io.connect("http://192.168.1.44:7005");
 // Vue.prototype.$socket = io.connect("http://192.168.2.121:7004");
-
+// new WebSocket("wss://webrtc-from-chat.glitch.me/")
 Vue.config.productionTip = false;
 
 new Vue({
